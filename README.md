@@ -9,16 +9,9 @@ This branch is for API server.
 
 ## Usage
 
-1. 로컬에 Mysql 서버 켜기
-```bash
-service mysql start
-```
-
-2. `/egg-talk/eggtalk/src/main/java/eggtalk/eggtalk/EggtalkApplication.java` 경로의 `EggtalkApplication.java` 실행
-
-
-
-<b>POST</b> `/api/signup`
+### 회원가입 
+<b>POST</b> `/api/signup`  
+아이디, 비밀번호, 이름으로 간단한 회원가입
 
 #### Request body
 ```json
@@ -30,7 +23,7 @@ service mysql start
 ```
 #### Response body
 
-```json
+```javascript
 {
     "username": "user_id",
     "nickname": "user_name",
@@ -41,8 +34,11 @@ service mysql start
     ]
 }
 ```
-<b>POST</b> `/api/authenticate`
+---
 
+### 로그인
+<b>POST</b> `/api/authenticate`  
+아이디와 비밀번호를 통해 토큰을 발급받음. 이후 서버에 요청을 보낼 때 토큰을 요청 본문(Request Body)에 삽입하여 권한 인증 가능.
 #### Request body
 ```json
 {
@@ -56,8 +52,7 @@ service mysql start
 {
     "token": "token_value"
 }
-
----
+```
 
 ## Plan
 
