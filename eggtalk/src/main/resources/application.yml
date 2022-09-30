@@ -1,0 +1,31 @@
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/eggtalk?serverTimezone=UTC&characterEncoding=UTF-8
+        username: ckdhkdwns
+        password: 1234
+
+    
+    jpa:
+        database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+        defer-datasource-initialization: true
+        hibernate:
+            ddl-auto: create-drop
+        properties:
+            hibernate:
+                format_sql: true
+                show_sql: true
+    sql:
+        init:
+            mode: always
+
+logging:
+  level:
+    eggtalk: DEBUG
+
+jwt:
+    header: Authorization
+    ## HS512 알고리즘을 사용하기 때문에 secret key를 64byte 이상으로 설정
+    secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+    token-validity-in-seconds: 86400
+
