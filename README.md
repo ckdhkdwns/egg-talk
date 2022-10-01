@@ -9,6 +9,8 @@ This branch is for API server.
 
 ## Usage
 
+<b>Server URL</b> `https://egg-talk-server.run.goorm.io`
+
 ### 회원가입 
 <b>POST</b> `/api/signup`  
 아이디, 비밀번호, 이름으로 간단한 회원가입
