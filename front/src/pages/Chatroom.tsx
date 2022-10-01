@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 import Logo from "../components/Logo";
 
 type userData = {
@@ -50,7 +51,7 @@ function Chatroom() {
       <Link to={"/"}>
         <Logo />
       </Link>
-      {user ? <div>Welcome, {user.username}</div> : <div>Please Login</div>}
+      {user ? <div>Welcome, {user.username}</div> : <Loader />}
     </div>
   ) : null;
 }

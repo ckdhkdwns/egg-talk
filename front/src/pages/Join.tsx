@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -54,6 +54,12 @@ const SignUpBtn = styled.button`
     background-color: #525e66;
   }
 `;
+const ErrorMessageArea = styled.div`
+  font-size: 0.75rem;
+  margin-top: 1rem;
+  line-height: 1rem;
+  color: red;
+`;
 
 type FormData = {
   username: string;
@@ -62,11 +68,16 @@ type FormData = {
 };
 
 function Join() {
-  const { register, handleSubmit } = useForm<FormData>();
-  let navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+  const [isValid, setIsValid] = useState(true);
+  const navigate = useNavigate();
 
   const onValid = async (data: FormData) => {
-    console.log(data);
+    // console.log(data);
     axios
       .post("https://egg-talk-server.run.goorm.io/api/signup", {
         username: data.username,
@@ -79,11 +90,11 @@ function Join() {
       })
       .catch(function (error) {
         console.log(error.response.data);
+        // Case 1. Unauthorized
+        error.request.status === 409 && setIsValid(false);
+        //Case 2. Internal server error
+        error.code === "ERR_NETWORK" && console.log("Internal Server");
       });
-  };
-
-  const onInvalid = (error: any) => {
-    console.log("error", error);
   };
 
   // console.log(watch()); // watch input value by passing the name of it
@@ -99,24 +110,56 @@ function Join() {
       <Link style={{ width: "fit-content", margin: "0 auto" }} to={"/"}>
         <Logo />
       </Link>
-      <Form onSubmit={handleSubmit(onValid, onInvalid)}>
+      <Form onSubmit={handleSubmit(onValid)}>
         <Label>아이디</Label>
         <Input
-          {...register("username", { required: true, maxLength: 15 })}
+          {...register("username", {
+            required: "아이디를 입력해주세요.",
+            minLength: { value: 5, message: "아이디가 너무 짧습니다" },
+            maxLength: { value: 20, message: "아이디가 너무 깁니다" },
+            pattern: {
+              value: /^[A-Za-z0-9].{5,20}$/,
+              message: "아이디는 5~20자의 영문 소문자, 숫자만 사용 가능합니다.",
+            },
+          })}
           placeholder="아이디를 입력하세요."
         />
         <Label>비밀번호</Label>
         <Input
-          {...register("password", { required: true, maxLength: 15 })}
+          {...register("password", {
+            required: "비밀번호를 입력해주세요.",
+            minLength: { value: 8, message: "비밀번호가 너무 짧습니다" },
+            maxLength: { value: 20, message: "비밀번호가 너무 깁니다" },
+            pattern: {
+              value: /^[A-Za-z0-9].{5,20}$/,
+              message:
+                "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.",
+            },
+          })}
           type="password"
           placeholder="비밀번호를 입력하세요."
         />
         <Label>닉네임</Label>
         <Input
-          {...register("nickname", { required: true, maxLength: 15 })}
+          {...register("nickname", {
+            required: "닉네임을 입력해주세요.",
+            maxLength: { value: 15, message: "닉네임가 너무 깁니다" },
+          })}
           placeholder="닉네임을 입력하세요."
         />
         <SignUpBtn>가입하기</SignUpBtn>
+        {errors.username ? (
+          <ErrorMessageArea>{errors.username.message}</ErrorMessageArea>
+        ) : errors.password ? (
+          <ErrorMessageArea>{errors.password.message}</ErrorMessageArea>
+        ) : errors.nickname ? (
+          <ErrorMessageArea>{errors.nickname.message}</ErrorMessageArea>
+        ) : !isValid ? (
+          <ErrorMessageArea>
+            이미 존재하는 아이디(로그인 전용 아이디)입니다. 다른 아이디를
+            입력해주세요.
+          </ErrorMessageArea>
+        ) : null}
       </Form>
     </Wrapper>
   );

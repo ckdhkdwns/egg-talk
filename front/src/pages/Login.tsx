@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { TailSpin } from "react-loader-spinner";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Logo from "../components/Logo";
@@ -47,7 +48,9 @@ const Input = styled.input`
     font-weight: 100;
   }
 `;
-const LoginBtn = styled.input`
+const LoginBtn = styled.button`
+  display: flex;
+  justify-content: center;
   text-align: center;
   margin: 10px 0;
   padding: 7px 0;
@@ -77,6 +80,13 @@ const Label = styled.label`
   font-family: "Noto Sans KR", sans-serif;
 `;
 
+const ErrorMessageArea = styled.div`
+  font-size: 0.75rem;
+  margin-top: 1rem;
+  line-height: 1rem;
+  color: red;
+`;
+
 type FormData = {
   username: string;
   password: string;
@@ -84,8 +94,13 @@ type FormData = {
 
 function Login() {
   const navigate = useNavigate();
-
-  const { register, handleSubmit } = useForm<FormData>();
+  const [isFetching, setIsFetching] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
 
   useEffect(() => {
     // if token exist
@@ -94,12 +109,14 @@ function Login() {
   });
 
   const onValid = async (data: FormData) => {
+    setIsFetching(true);
     axios
       .post("https://egg-talk-server.run.goorm.io/api/authenticate", {
         ...data,
       })
       .then(function (response: AxiosResponse) {
-        console.log("res.data.accessToken : ", response.data.token);
+        // console.log("res.data.accessToken : ", response.data.token);
+        setIsFetching(false);
         localStorage.setItem(
           "token",
           JSON.stringify({ token: response.data.token })
@@ -107,12 +124,14 @@ function Login() {
         navigate("/chatroom");
       })
       .catch(function (error: AxiosError) {
-        console.log(error.request.statusText);
-      });
-  };
+        // console.log(error);
 
-  const onInvalid = (error: any) => {
-    console.log("error", error);
+        setIsFetching(false);
+        // Case 1. Unauthorized
+        error.request.status === 401 && setIsAuthorized(false);
+        //Case 2. Internal server error
+        error.code === "ERR_NETWORK" && console.log("Internal Server");
+      });
   };
 
   return (
@@ -127,22 +146,53 @@ function Login() {
         <Link style={{ width: "fit-content", margin: "0 auto" }} to={"/"}>
           <Logo />
         </Link>
-        <Form onSubmit={handleSubmit(onValid, onInvalid)}>
+        <Form onSubmit={handleSubmit(onValid)}>
           <Label>아이디</Label>
           <Input
-            {...register("username", { required: true, maxLength: 15 })}
+            {...register("username", {
+              required: "This is Required",
+            })}
             placeholder="아이디를 입력하세요"
           />
+          {/* <ErrorMessage errors={errors} name="username" /> */}
           <Label>비밀번호</Label>
           <Input
-            {...register("password", { required: true, maxLength: 15 })}
+            {...register("password", {
+              required: "This is Required",
+            })}
             type="password"
             placeholder="비밀번호를 입력하세요"
           />
-          <LoginBtn type="submit" value="로그인" />
+          {/* <ErrorMessage errors={errors} name="password" /> */}
+          <LoginBtn type="submit">
+            {isFetching ? (
+              <TailSpin
+                height="20"
+                width="20"
+                color="#fff"
+                ariaLabel="tail-spin-loading"
+                radius="1"
+                wrapperStyle={{}}
+                wrapperClass=""
+                visible={true}
+              />
+            ) : (
+              "로그인"
+            )}
+          </LoginBtn>
           <Label style={{ margin: "5px 0 0 3px" }}>
             <Link to={"/signup"}>가입하기</Link>
           </Label>
+          {errors.username ? (
+            <ErrorMessageArea>아이디를 입력해 주세요.</ErrorMessageArea>
+          ) : errors.password ? (
+            <ErrorMessageArea>비밀번호를 입력해 주세요.</ErrorMessageArea>
+          ) : !isAuthorized ? (
+            <ErrorMessageArea>
+              아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다.
+              입력하신 내용을 다시 확인해주세요.
+            </ErrorMessageArea>
+          ) : null}
         </Form>
       </RightContainer>
     </Wrapper>
