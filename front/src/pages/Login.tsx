@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -37,7 +37,7 @@ const Form = styled.form`
 const Input = styled.input`
   all: unset;
   margin: 0.5rem 0;
-  padding: 4px 10px;
+  padding: 8px 10px;
   margin-bottom: 0.5rem;
   border-radius: 3px;
   box-shadow: rgb(15 15 15 / 20%) 0px 0px 0px 1px inset;
@@ -83,18 +83,27 @@ type FormData = {
 };
 
 function Login() {
+  const navigate = useNavigate();
+
   const { register, handleSubmit } = useForm<FormData>();
-  let navigate = useNavigate();
+
+  useEffect(() => {
+    // if token exist
+    if (localStorage.getItem("token") && localStorage.getItem("token") !== "")
+      navigate("/chatroom");
+  });
 
   const onValid = async (data: FormData) => {
-    console.log(data);
     axios
       .post("https://egg-talk-server.run.goorm.io/api/authenticate", {
-        username: data.username,
-        password: data.password,
+        ...data,
       })
       .then(function (response: AxiosResponse) {
-        console.log("res.data.accessToken : ", response.data);
+        console.log("res.data.accessToken : ", response.data.token);
+        localStorage.setItem(
+          "token",
+          JSON.stringify({ token: response.data.token })
+        );
         navigate("/chatroom");
       })
       .catch(function (error: AxiosError) {
@@ -132,7 +141,7 @@ function Login() {
           />
           <LoginBtn type="submit" value="로그인" />
           <Label style={{ margin: "5px 0 0 3px" }}>
-            <Link to={"./join"}>가입하기</Link>
+            <Link to={"/signup"}>가입하기</Link>
           </Label>
         </Form>
       </RightContainer>

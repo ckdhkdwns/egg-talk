@@ -1,5 +1,5 @@
 import axios from "axios";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -14,19 +14,20 @@ const Form = styled.form`
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  width: 258px;
+  width: 300px;
   margin: 0 auto;
 `;
 const Input = styled.input`
-  all: unset;
   width: 100%;
   margin: 0.5rem 0;
-  padding: 4px 10px;
+  padding: 8px 10px;
   margin-bottom: 0.5rem;
   border-radius: 3px;
   box-shadow: rgb(15 15 15 / 20%) 0px 0px 0px 1px inset;
   background: rgba(242, 241, 238, 0.6);
   font-size: 0.9rem;
+  border: none;
+  outline: none;
 `;
 const Label = styled.label`
   color: rgba(55, 53, 47, 0.65);
@@ -68,9 +69,9 @@ function Join() {
     console.log(data);
     axios
       .post("https://egg-talk-server.run.goorm.io/api/signup", {
-        username: "juyeolyoon", // data.username,
-        password: "Juyeol123~", // data.password,
-        nickname: "ggusom", // data.nickname,
+        username: data.username,
+        password: data.password,
+        nickname: data.nickname,
       })
       .then(function (response) {
         console.log(response);
@@ -86,6 +87,12 @@ function Join() {
   };
 
   // console.log(watch()); // watch input value by passing the name of it
+
+  useEffect(() => {
+    // if token exist
+    if (localStorage.getItem("token") && localStorage.getItem("token") !== "")
+      navigate("/chatroom");
+  });
 
   return (
     <Wrapper>
