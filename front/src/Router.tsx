@@ -7,7 +7,7 @@ function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/join" element={<Join />} />
+        <Route path="/signup" element={<Join />} />
         <Route path="/chatroom" element={<Chatroom />} />
         <Route path="/" element={<Login />} />
       </Routes>
