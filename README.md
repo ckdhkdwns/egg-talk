@@ -2,6 +2,13 @@
 
 <b>Temporary Server URL</b> `https://egg-talk-server.run.goorm.io`
 
+---
+## Chat functions is available
+
+[demo chat](https://egg-talk-server.run.goorm.io/chat/room/)
+
+---
+
 - [회원가입](#회원가입)  
 - [로그인](#로그인)  
 - [유저 정보 불러오기](#유저-정보-불러오기)  

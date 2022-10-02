@@ -48,7 +48,11 @@ public class SecurityConfig {
                 , "/favicon.ico"
                 , "/error"
                 , "/static/**"
-                , "/stomp/**");
+                , "/stomp/**"
+                , "/chat/**"
+                , "/topic/**"
+                , "/app/**"
+                , "/ws/**");
     }
 
     @Bean
