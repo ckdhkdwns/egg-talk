@@ -1,4 +1,6 @@
 spring:
+    mvc:
+        static-path-pattern: "/static/**"
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
         url: jdbc:mysql://localhost:3306/eggtalk?serverTimezone=UTC&characterEncoding=UTF-8
@@ -10,9 +12,8 @@ spring:
         database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
         defer-datasource-initialization: true
         hibernate:
-            ddl-auto: create-drop
+            ddl-auto: update
         properties:
-            hibernate:
                 format_sql: true
                 show_sql: true
     sql:

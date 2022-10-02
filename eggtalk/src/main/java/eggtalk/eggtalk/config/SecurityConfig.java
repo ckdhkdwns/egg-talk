@@ -46,11 +46,16 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers("/mysql/**"
                 , "/favicon.ico"
-                , "/error");
+                , "/error"
+                , "/static/**"
+                , "/stomp/**");
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        /*
+          
+         */
         httpSecurity
                 // token을 사용하는 방식이기 때문에 csrf를 disable합니다.
                 .csrf().disable()
@@ -73,11 +78,13 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
+                /* */
                 .authorizeRequests()
-                .antMatchers("/api/hello").permitAll()
-                .antMatchers("/api/authenticate").permitAll()
-                .antMatchers("/api/signup").permitAll()
 
+                .antMatchers("/auth").permitAll()
+                .antMatchers("/user").permitAll()
+                .antMatchers("/static/**").permitAll()
+                .antMatchers("/stomp/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

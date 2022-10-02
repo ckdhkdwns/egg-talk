@@ -2,6 +2,9 @@ package eggtalk.eggtalk.service;
 
 import java.util.Collections;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +24,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordValidator passwordValidator;
-
+    
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, PasswordValidator passwordValidator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -30,7 +34,7 @@ public class UserService {
 
     @Transactional
     public UserDto signup(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
+        if (userRepository.findOneWithAuthoritiesByUserId(userDto.getUserId()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
         }
         if (passwordValidator.isValidPassword(userDto.getPassword())){
@@ -40,11 +44,14 @@ public class UserService {
         Authority authority = Authority.builder()
                 .authorityName("ROLE_USER")
                 .build();
-
+        
         User user = User.builder()
-                .username(userDto.getUsername())
+                
+                .userId(userDto.getUserId())
                 .password(passwordEncoder.encode(userDto.getPassword()))
-                .nickname(userDto.getNickname())
+                .username(userDto.getUsername())
+                .gender(userDto.getGender())
+                .email(userDto.getEmail())
                 .authorities(Collections.singleton(authority))
                 .activated(true)
                 .build();
@@ -53,16 +60,29 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto getUserWithAuthorities(String username) {
-        return UserDto.from(userRepository.findOneWithAuthoritiesByUsername(username).orElse(null));
+    public UserDto getUserWithAuthorities(String userId) {
+        return UserDto.from(userRepository.findOneWithAuthoritiesByUserId(userId).orElse(null));
     }
 
     @Transactional(readOnly = true)
     public UserDto getMyUserWithAuthorities() {
         return UserDto.from(
-                SecurityUtil.getCurrentUsername()
-                        .flatMap(userRepository::findOneWithAuthoritiesByUsername)
+                SecurityUtil.getCurrentUserId()
+                        .flatMap(userRepository::findOneWithAuthoritiesByUserId)
                         .orElseThrow(() -> new NotFoundMemberException("Member not found"))
         );
     }
+     @Transactional
+    public UserDto updateUserInfo(UserDto updateUserDto) {
+        User user = userRepository.findOneWithAuthoritiesByUserId(SecurityUtil.getCurrentUserId().get()).get();
+        
+        user.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
+        user.setUsername(updateUserDto.getUsername());
+        user.setEmail(updateUserDto.getEmail());
+        
+        
+        return UserDto.from(userRepository.save(user));
+    }
+    
+    
 }

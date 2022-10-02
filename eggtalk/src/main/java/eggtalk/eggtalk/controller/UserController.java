@@ -16,43 +16,39 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class UserController {
     private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
-    @GetMapping("/hello")
-    public ResponseEntity<String> hello() {
-        return ResponseEntity.ok("hello");
+    
+    //유저 정보 불러오기 (Select)
+    @GetMapping("/user")
+    public ResponseEntity<UserDto> getMyUserInfo(HttpServletRequest request) {
+        return ResponseEntity.ok(userService.getMyUserWithAuthorities());
     }
-
-    @PostMapping("/test-redirect")
-    public void testRedirect(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/api/user");
-    }
-
-    @PostMapping("/signup")
+    //유저 정보 등록하기 (Insert)
+    @PostMapping("/user")
     public ResponseEntity<UserDto> signup(
             @Valid @RequestBody UserDto userDto) {
         return ResponseEntity.ok(userService.signup(userDto));
     }
-
-    @GetMapping("/user")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<UserDto> getMyUserInfo(HttpServletRequest request) {
-        return ResponseEntity.ok(userService.getMyUserWithAuthorities());
+    //유저 정보 수정하기 (Update)
+    @PutMapping("/user")
+    public ResponseEntity<UserDto> updateUserInfo(
+        @RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.updateUserInfo(userDto));
     }
 
-    @GetMapping("/user/{username}")
+
+    @GetMapping("/user/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<UserDto> getUserInfo(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserWithAuthorities(username));
+    public ResponseEntity<UserDto> getUserInfo(@PathVariable String userId) {
+        return ResponseEntity.ok(userService.getUserWithAuthorities(userId));
     }
-
-
+    
     //아이디 중복 예외처리 - 409
     @ExceptionHandler(DuplicateMemberException.class)
     public ResponseEntity<String> handleNoSuchElementFoundException(DuplicateMemberException exception) {
