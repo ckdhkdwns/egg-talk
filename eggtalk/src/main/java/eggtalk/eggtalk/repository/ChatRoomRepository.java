@@ -5,5 +5,4 @@ import eggtalk.eggtalk.entity.ChatRoom;
 
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    
 }

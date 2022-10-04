@@ -49,10 +49,8 @@ public class SecurityConfig {
                 , "/error"
                 , "/static/**"
                 , "/stomp/**"
-                , "/chat/**"
                 , "/topic/**"
-                , "/app/**"
-                , "/ws/**");
+                , "/app/**");
     }
 
     @Bean
@@ -87,8 +85,10 @@ public class SecurityConfig {
 
                 .antMatchers("/auth").permitAll()
                 .antMatchers("/user").permitAll()
+                .antMatchers("/chat/**").permitAll()
                 .antMatchers("/static/**").permitAll()
                 .antMatchers("/stomp/**").permitAll()
+                .antMatchers("/ws/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

@@ -57,9 +57,11 @@
 				room: {},
 				sender: '',
 				message: '',
-				messages: []
+				messages: [],
+				token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY0OTYzMDU1fQ.GF8jDzxQ98p6QHudawsu6lP69DyO-TGLmnJzQwNYhR1tRN3Pouu5yYaInUrgxFzIUfuZdGi58RRlaACe7It2Zg"
 			},
 			created() {
+				
 				this.roomId = localStorage.getItem('wschat.roomId');
 				this.sender = localStorage.getItem('wschat.sender');
 				this.findRoom();
@@ -69,7 +71,7 @@
 					axios.get('/chat/room/' + this.roomId).then(response => { this.room = response.data; });
 				},
 				sendMessage: function () {
-					ws.send("/app/chat/message", {}, JSON.stringify({ messageType: 1, roomId: this.roomId, sender: this.sender, message: this.message }));
+					ws.send("/app/chat/message", {Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY0OTYzMDU1fQ.GF8jDzxQ98p6QHudawsu6lP69DyO-TGLmnJzQwNYhR1tRN3Pouu5yYaInUrgxFzIUfuZdGi58RRlaACe7It2Zg"}, JSON.stringify({ messageType: 1, roomId: this.roomId, sender: this.sender, message: this.message }));
 					this.message = '';
 				},
 				recvMessage: function (recv) {
@@ -80,12 +82,12 @@
 
 		function connect() {
 			// pub/sub event
-			ws.connect({}, function (frame) {
+			ws.connect({ Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY0OTYzMDU1fQ.GF8jDzxQ98p6QHudawsu6lP69DyO-TGLmnJzQwNYhR1tRN3Pouu5yYaInUrgxFzIUfuZdGi58RRlaACe7It2Zg" }, function (frame) {
 				ws.subscribe("/topic/chat/room/" + vm.$data.roomId, function (message) {
 					var recv = JSON.parse(message.body);
 					vm.recvMessage(recv);
 				});
-				ws.send("/app/chat/message", {}, JSON.stringify({ messageType: 0, roomId: vm.$data.roomId, sender: vm.$data.sender }));
+				ws.send("/app/chat/message", {Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY0OTYzMDU1fQ.GF8jDzxQ98p6QHudawsu6lP69DyO-TGLmnJzQwNYhR1tRN3Pouu5yYaInUrgxFzIUfuZdGi58RRlaACe7It2Zg"}, JSON.stringify({ messageType: 0, roomId: vm.$data.roomId, sender: vm.$data.sender }));
 			}, function (error) {
 				if (reconnect++ <= 5) {
 					setTimeout(function () {

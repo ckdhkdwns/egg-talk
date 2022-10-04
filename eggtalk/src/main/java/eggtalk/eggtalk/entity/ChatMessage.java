@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatMessage {
+public class ChatMessage extends BaseTime {
 
     @Id
     @Column(name = "id")
@@ -19,12 +19,12 @@ public class ChatMessage {
     @Column(name = "message_type", length = 1)
     private Integer messageType;
 
-    @Column(name = "room_id", length = 1000)
-    private String roomId;
+    @Column(name = "room_id", length = 100)
+    private Long roomId;
     
     @Column(name = "sender", length = 50)
     private String sender;
     
-    @Column(name = "message", length = 100)
+    @Column(name = "message", length = 1000)
     private String message;
 }

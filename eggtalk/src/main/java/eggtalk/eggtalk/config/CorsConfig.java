@@ -1,6 +1,5 @@
 package eggtalk.eggtalk.config;
 
-import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ public class CorsConfig {
       config.addAllowedHeader("*");
       config.addAllowedMethod("*");
 
-      source.registerCorsConfiguration("/api/**", config);
+      source.registerCorsConfiguration("/**", config);
       return new CorsFilter(source);
    }
 }

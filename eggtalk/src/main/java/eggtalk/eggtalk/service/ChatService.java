@@ -1,34 +1,26 @@
 package eggtalk.eggtalk.service;
 
 import java.util.*;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.stereotype.Service;
 
+import eggtalk.eggtalk.dto.ChatMessageDto;
 import eggtalk.eggtalk.dto.ChatRoomDto;
+import eggtalk.eggtalk.dto.UserRoomDto;
+import eggtalk.eggtalk.entity.ChatMessage;
 import eggtalk.eggtalk.entity.ChatRoom;
+import eggtalk.eggtalk.entity.UserRoom;
+import eggtalk.eggtalk.repository.ChatMessageRepository;
 import eggtalk.eggtalk.repository.ChatRoomRepository;
-import eggtalk.eggtalk.repository.UserRepository;
+import eggtalk.eggtalk.repository.UserRoomRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
+@RequiredArgsConstructor
 public class ChatService {
 
     public final ChatRoomRepository chatRoomRepository;
-
-    public ChatService(ChatRoomRepository chatRoomRepository) {
-        this.chatRoomRepository = chatRoomRepository;
-    }
-    /*
-    @PostConstruct
-    //의존관게 주입완료되면 실행되는 코드
-    private void init() {
-        chatRooms = new LinkedHashMap<>();
-    }
-    */
+    public final ChatMessageRepository chatMessageRepository;
+    public final UserRoomRepository userRoomRepository;
 
     //채팅방 불러오기
     public List<ChatRoom> findAllRoom() {
@@ -45,12 +37,45 @@ public class ChatService {
     }
 
     //채팅방 생성
-    public ChatRoomDto createRoom(String name) {
+    public ChatRoomDto createRoom(String creatorId, String roomName) {
         ChatRoom chatRoom = ChatRoom.builder()
-            .roomName(name)
-            .build();
-
+            .creatorId(creatorId)
+            .roomName(roomName)
+            .build();   
         
-        return ChatRoomDto.from(chatRoomRepository.save(chatRoom));
+        Long roomId = chatRoomRepository.save(chatRoom).getRoomId();
+
+        UserRoom userRoom = UserRoom.builder()
+            .userId(creatorId)
+            .roomName(roomName)
+            .roomId(roomId)
+            .build();
+        
+        userRoomRepository.save(userRoom);
+
+        return ChatRoomDto.builder()
+            .creatorId(creatorId)
+            .roomName(roomName)
+            .build();
     }
+
+    // 채팅 메세지 저장
+    public ChatMessageDto createMessage(ChatMessage chatMessage) {
+        return ChatMessageDto.from(chatMessageRepository.save(chatMessage));
+    }
+
+    /** 방 아이디로 메세지 찾기 */
+    public List<ChatMessage> findMessageByRoomId(Long roomId) {
+        return chatMessageRepository.findAllByRoomId(roomId);
+    }
+    
+    public List<ChatRoom> findRoomIdByUserId(String userId) {
+        List<UserRoom> userRooms = userRoomRepository.findAllByUserId(userId);
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        for(int i=0;i<userRooms.size();i++) {
+            chatRooms.add(chatRoomRepository.findById(userRooms.get(i).getRoomId()).get());
+        }
+        return chatRooms;
+    }
+    
 }

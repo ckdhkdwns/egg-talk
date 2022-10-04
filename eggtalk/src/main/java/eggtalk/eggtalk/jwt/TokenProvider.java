@@ -78,6 +78,16 @@ public class TokenProvider implements InitializingBean {
       return new UsernamePasswordAuthenticationToken(principal, token, authorities);
    }
 
+   public String getUserPk(String token) {
+      Claims claims = Jwts
+              .parserBuilder()
+              .setSigningKey(key)
+              .build()
+              .parseClaimsJws(token)
+              .getBody();
+      return claims.getSubject();
+  }
+
    //토큰의 유효성 검증
    public boolean validateToken(String token) {
       try {
@@ -94,4 +104,6 @@ public class TokenProvider implements InitializingBean {
       }
       return false;
    }
+
+
 }

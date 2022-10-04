@@ -43,6 +43,7 @@
         el: '#app',
         data: {
             room_name : '',
+            token: '',
             chatrooms: [
             ]
         },
@@ -60,7 +61,11 @@
                 } else {
                     var params = new URLSearchParams();
                     params.append("name",this.room_name);
-                    axios.post('/chat/room', params)
+                    axios.post('/chat/room', params, {
+                        headers: {
+                            "token": "Bearer " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY0ODg4OTA2fQ.MaKlU8i6aD8IQ4VnnApw2xlrsZNCIvmRg-kHYOl2yEpNZoLvaDnsG1MoBXipsVTHCX6YTWGO4D3x_ck-9cgN0w"
+                        }
+                    })
                         .then(
                             response => {
                                 alert(response.data.roomName+"방 개설에 성공하였습니다.")
@@ -76,7 +81,7 @@
                 if(sender !== "") {
                     localStorage.setItem('wschat.sender',sender);
                     localStorage.setItem('wschat.roomId',roomId);
-                    location.href="/chat/room/enter/"+roomId;
+                    location.href="/chat/page/room/enter/"+roomId;
                 }
             }
         }

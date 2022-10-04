@@ -11,10 +11,9 @@ import eggtalk.eggtalk.exception.InvalidPasswordException;
 import eggtalk.eggtalk.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
+@CrossOrigin(origins = { "*" })
 @RestController
 @RequestMapping("/")
 public class UserController {
