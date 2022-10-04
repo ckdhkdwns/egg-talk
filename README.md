@@ -1,7 +1,6 @@
 # Egg Talk
 
 <b>Temporary Server URL</b> `https://egg-talk-server.run.goorm.io`  
-<b>Chat</b> [Try it](https://egg-talk-server.run.goorm.io/chat/room/)
 
 ---
 
