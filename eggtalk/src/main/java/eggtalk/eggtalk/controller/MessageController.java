@@ -21,12 +21,16 @@ public class MessageController {
     @MessageMapping("/chat/message")
     public void enter(ChatMessage message, @Header(name = "Authorization") String token) {
         String username = tokenProvider.getUserPk(token);
+        
         message.setSender(username);
-
         if (message.getMessageType().equals(0)) {
+            chatService.enterRoom(username, message.getRoomId());
             message.setMessage(username+"님이 입장하였습니다.");
         }
         sendingOperations.convertAndSend("/topic/chat/room/"+message.getRoomId(),message);
         chatService.createMessage(message);
     }
+
+
+    
 }

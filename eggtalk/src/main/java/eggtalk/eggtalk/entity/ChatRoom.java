@@ -2,8 +2,6 @@ package eggtalk.eggtalk.entity;
 
 import lombok.*;
 
-import java.util.Set;
-
 import javax.persistence.*;
 
 

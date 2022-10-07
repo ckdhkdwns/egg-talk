@@ -1,0 +1,115 @@
+<style>
+    .messages{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 600px;
+        overflow-y: scroll;
+    }
+    .messages div {
+        padding: 10px;
+        font-size: 15px;
+
+    }
+</style>
+<body>
+    <input class="input-message" />
+    <button class="send-btn" onclick="sendMessage()">Send</button>
+    <div class="messages"></div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.10/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+    const urlParams = new URL(location.href).searchParams;
+
+    function query(q) {
+        return document.querySelector(q);
+    }
+    let sock = new SockJS("/ws/chat");
+    let ws = Stomp.over(sock);
+    let reconnect = 0;
+
+    const data = {
+        token: urlParams.get('token'),
+        roomId: urlParams.get('roomId'),
+        messages: []
+    }
+
+    function connectServer() {
+        console.log("Token: " + data.token + "\n" + "Room Id: " + data.roomId);
+
+        ws.connect({ Authorization: data.token }, function (frame) {
+            console.log(frame);
+            ws.subscribe("/topic/chat/room/" + data.roomId, function (message) {
+                var recv = JSON.parse(message.body);
+                data.messages.push({
+                    name: recv.sender,
+                    content: recv.message,
+                    createdDate: recv.createdDate
+                });
+                appendMessageToBoard(recv.sender, recv.message, recv.createdDate);
+            });
+            ws.send("/app/chat/message", {
+                Authorization: data.token
+            },
+                JSON.stringify({
+                    messageType: 0,
+                    roomId: data.roomId
+                }));
+        }, function (error) {
+            if (reconnect++ <= 5) {
+                setTimeout(function () {
+                    console.log("connection reconnect");
+                    sock = new SockJS("/ws/chat");
+                    ws = Stomp.over(sock);
+                    connect();
+                }, 1000);
+            }
+        });
+    }
+
+    function sendMessage() {
+        ws.send("/app/chat/message", {
+            Authorization: data.token
+        },
+            JSON.stringify({
+                messageType: 1,
+                roomId: data.roomId,
+                message: query(".input-message").value
+            }));
+    }
+
+    function loadPastMessages() {
+        axios.get("/rooms/"+data.roomId+"/messages", {headers : { Authorization: data.token }})
+            .then((res) => {
+                for(let m of res.data) {
+                    const message = {
+                        name: "",
+                        content: "",
+                        date: ""
+                    }
+                    message.name = m.sender;
+                    message.content = m.message;
+                    message.date = m.createdDate;
+                    data.messages.push(message);
+
+                    appendMessageToBoard(m.sender, m.message, m.createdDate);
+                }
+            });
+        
+    }
+
+    function appendMessageToBoard(name, content, date) {
+        const el = document.createElement("div");
+        el.innerText = name + " - " + content + " - " + date;
+        console.log(el)
+        query(".messages").appendChild(el);
+
+        query(".messages").scrollTop = query(".messages").scrollHeight;
+    }
+    connectServer();
+    loadPastMessages();
+</script>

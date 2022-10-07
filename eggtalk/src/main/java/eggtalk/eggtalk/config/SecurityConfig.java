@@ -50,7 +50,9 @@ public class SecurityConfig {
                 , "/static/**"
                 , "/stomp/**"
                 , "/topic/**"
-                , "/app/**");
+                , "/app/**"
+                , "/rooms/page/**"
+                , "/rooms/chattest/**");
     }
 
     @Bean
@@ -83,7 +85,7 @@ public class SecurityConfig {
                 /* */
                 .authorizeRequests()
 
-                .antMatchers("/auth").permitAll()
+                .antMatchers("/auth/**").permitAll()
                 .antMatchers("/user").permitAll()
                 .antMatchers("/chat/**").permitAll()
                 .antMatchers("/static/**").permitAll()

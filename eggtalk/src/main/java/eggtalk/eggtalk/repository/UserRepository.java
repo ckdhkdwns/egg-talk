@@ -10,4 +10,6 @@ import eggtalk.eggtalk.entity.User;
 public interface UserRepository extends JpaRepository<User, String> {
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findOneWithAuthoritiesByUserId(String userId);
+
+    User findByUserId(String userId);
 }
