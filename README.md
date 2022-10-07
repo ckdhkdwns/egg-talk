@@ -361,7 +361,7 @@
 그리고 웹소켓 예시 코드...  
 
 `/src/main/resources/templates/chattest.html`
-[Link](https://github.com/ckdhkdwns/egg-talk/blob/api/eggtalk/src/main/resources/templates/roomdetail.html)
+[Link](https://github.com/ckdhkdwns/egg-talk/blob/api/eggtalk/src/main/resources/templates/chattest.html)
 
 
 ## Versions
