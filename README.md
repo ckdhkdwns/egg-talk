@@ -4,24 +4,28 @@
 
 ---
 
+
+**User Controller **`/users/**`  
 - [회원가입](#회원가입)  
 - [로그인](#로그인)  
-- [유저 정보 불러오기](#유저-정보-불러오기)  
+- [유저 정보 불러오기](#현재-유저-정보-불러오기)  
 - [유저 정보 수정하기](#유저-정보-수정하기)  
+- [유저 채팅방 목록 가져오기](#유저-채팅방-목록-가져오기)
 
+`/rooms/**`  
 - [채팅방 생성하기](#채팅방-생성하기)
-- [채팅방 목록 가져오기](#채팅방-목록-가져오기)
-- [채팅방의 채팅들 불러오기](#채팅방의-채팅들-불러오기)
+- [모든 채팅방 목록 가져오기](#모든-채팅방-목록-가져오기)
+- [채팅방 내의 메세지 가져오기](#채팅방-내의-메세지-가져오기)
+
 ---
 
 ### 회원가입 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `POST` | `/user` | `False` |
+| `POST` | `/users` | `False` |
 
 - 아이디, 비밀번호, 이름으로 간단한 회원가입 가능.  
 - 비밀번호는 영문자, 숫자를 각각 포함한 8~20자의 문자열이어야 함.  
-
 
 
 #### Request body
@@ -53,7 +57,7 @@
 
 ### 로그인
 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
 | `POST` | `/auth` | `True` |
 
@@ -75,18 +79,18 @@
 ```
 ---
 
-### 유저 정보 불러오기
+### 현재 유저 정보 불러오기
 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `GET` | `/user` | `True` |
+| `GET` | `/auth/me` | `True` |
 
 - 헤더에 토큰값을 추가해서 요청하면 서버에서는 토큰을 통해 사용자의 정보를 응답한다.
 #### Requset header
 ```javascript
 {
     ...
-    "Authorization": "Bearer " + $token
+    "Authorization": token
 }
 ```
 
@@ -109,11 +113,13 @@
 
 ### 유저 정보 수정하기
 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `PUT` | `/user` | `True` |
+| `PUT` | `/users/{userId}` | `True` |
 
+- URL의 `userId`와 토큰의 `userId`가 일치하면 해당 아이디의 유저 정보를 수정함.
 - 비밀번호, 유저이름, 이메일을 수정할 수 있다.
+
 
 #### Requset body
 ```javascript
@@ -141,59 +147,77 @@
 
 ---
 
-### 채팅방 목록 가져오기
+### 모든 채팅방 목록 가져오기
 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `GET` | `/chat/room` | `Optional` |
+| `GET` | `/rooms` | `True` |
 
-- 헤더에 토큰이 있다면 토큰을 기반으로 특정 유저가 가지고 있는 채팅방 목록을 가져옴.
-- 토큰으로 유저를 찾는 데 실패하거나 토큰이 없다면 모든 채팅방 목록을 가져옴.
+- 모든 채팅방 목록을 가져옴
 
-
-
-#### Requset Header
-1. 특정 유저의 채팅방 목록 반환
+#### Request
 ```javascript
-{
-    ...
-    "Authorization": "Bearer " + $token
-}
-```
-2. 모든 채팅방 목록 반환
-```javascript
-null
+//생략  
 ```
 
 #### Response body
 ```javascript
 //test value
 [
+    ...
     {
         "createdDate": "2022-10-04T13:38:50",
-        "modifiedDate": "2022-10-04T13:38:50",
         "roomId": 10,
         "creatorId": "test32",
         "roomName": "testterdf"
     },
     {
         "createdDate": "2022-10-04T13:53:51",
-        "modifiedDate": "2022-10-04T13:53:51",
         "roomId": 11,
+        "creatorId": "ckdhkdwns",
+        "roomName": "My room!"
+    }
+    ...
+]
+```
+---
+
+### 유저 채팅방 목록 가져오기
+
+| Method | URL | Token Necessity |
+|:---:|:---:|:---:|
+| `GET` | `/users/{userId}/rooms` | `True` |
+
+- URL의 `userId`와 토큰의 `userId`가 일치하면 해당 아이디의 유저 정보를 가져옴.
+
+### URL
+
+`.../users/test32/rooms`
+
+### Response Body 
+
+```javascript
+// 
+[
+    ...
+    {
+        "createdDate": "2022-10-04T13:38:50",
+        "roomId": 10,
         "creatorId": "test32",
         "roomName": "testterdf"
-    }
+    },
+    ...
 ]
 ```
 ---
 
 ### 채팅방 생성하기
 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `POST` | `/chat/room` | `True` |
+| `POST` | `/rooms` | `True` |
 
-- 방 제목을 통해 채팅방을 생성한다.
+- 채팅방을 생성한다.
 
 #### Request body
 ```javascript
@@ -204,89 +228,50 @@ null
 #### Response body
 ```javascript
 {
-    "creatorId": "test32",
-    "roomName": "My room!",
-    "userDtoSet": null
+    "creatorId": "test32", // 토큰의 userId
+    "roomName": "My room!", // request header의  roomName
 }
 ```
 
 ---
 
-### 채팅방의 채팅들 불러오기
+### 채팅방 내의 메세지 가져오기
 
-| Method | Url | Token Necessity |
+| Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `GET` | `/chat/room/{roomId}` | `False yet` |
+| `GET` | `/rooms/{roomId}/messages` | `True` |
 
 - 방 아이디를 통해 채팅 메세지들을 불러온다.
 
 #### URL
-`.../chat/room/5`
+`.../rooms/6/messages`
 
 #### Response body
 
 ```javascript
-//test value
 [
+    ...
     {
-        "createdDate": "2022-10-04T12:42:40",
-        "modifiedDate": "2022-10-04T12:42:40",
-        "id": 20,
+        "createdDate": "2022-10-04T10:31:19",
+        "id": 4,
         "messageType": 0,
-        "roomId": 5,
-        "sender": "test32",
-        "message": "test32님이 입장하였습니다."
-    },
-    {
-        "createdDate": "2022-10-04T12:42:43",
-        "modifiedDate": "2022-10-04T12:42:43",
-        "id": 21,
-        "messageType": 1,
-        "roomId": 5,
-        "sender": "test32",
-        "message": "ASDASDASD"
-    },
-    {
-        "createdDate": "2022-10-04T13:17:28",
-        "modifiedDate": "2022-10-04T13:17:28",
-        "id": 22,
-        "messageType": 0,
-        "roomId": 5,
-        "sender": "test32",
-        "message": "test32님이 입장하였습니다."
+        "roomId": 6,
+        "sender": "testuser",
+        "message": "testuser님이 입장하였습니다."
     },
     {
         "createdDate": "2022-10-04T13:17:31",
-        "modifiedDate": "2022-10-04T13:17:31",
         "id": 23,
         "messageType": 1,
         "roomId": 5,
         "sender": "test32",
         "message": "asdasdasd"
     },
-    {
-        "createdDate": "2022-10-04T13:19:13",
-        "modifiedDate": "2022-10-04T13:19:13",
-        "id": 24,
-        "messageType": 0,
-        "roomId": 5,
-        "sender": "test32",
-        "message": "test32님이 입장하였습니다."
-    },
-    {
-        "createdDate": "2022-10-04T13:36:58",
-        "modifiedDate": "2022-10-04T13:36:58",
-        "id": 25,
-        "messageType": 0,
-        "roomId": 5,
-        "sender": "test32",
-        "message": "test32님이 입장하였습니다."
-    }
+    ...
 ]
 ```
 
 ---
-
 그리고 웹소켓 예시 코드...  
 
 `/src/main/resources/templates/roomdetail.html`
@@ -299,5 +284,4 @@ null
 - <b>jdk</b> 17.0.4 (openjdk)
 - <b>springboot</b> 2.7.4
 
-## Plan
 
