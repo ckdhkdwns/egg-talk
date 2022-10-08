@@ -58,7 +58,7 @@
 				sender: '',
 				message: '',
 				messages: [],
-				token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY1MjAwMTcyfQ.p-YSPKKAxON5yG13pekC8lBzJ13HZIlpJbE17FK1SPBIZhTKTAwa-1k0D29hbb3aSy6rqQzPIPs1HC15_TN69Q"
+				token: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY1MjcxNjgwfQ.cEjjnwJW5U7xWj4kXraDy-nc0khtwv-vBj70FGCqbLbk84YeNvN43eTyPsqqXlfC3JUhrIj6ugVCL3gZMQhtwQ"
 			},
 			created() {
 				
@@ -71,7 +71,7 @@
 					axios.get('/chat/room/' + this.roomId).then(response => { this.room = response.data; });
 				},
 				sendMessage: function () {
-					ws.send("/app/chat/message", {Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJja2Roa2R3bnMiLCJhdXRoIjoiIiwiZXhwIjoxNjY1MjA3MzY0fQ.fxYJGZL1LG7jOitcenQlABevQ8NSe39ZJe3DOlNVhCABCI6Osg09MVeChwxZbl53_u5S2H0OjQsvH5ihgaguSQ"}, JSON.stringify({ messageType: 1, roomId: this.roomId, sender: this.sender, message: this.message }));
+					ws.send("/app/chat/message", {Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY1MjcxNjgwfQ.cEjjnwJW5U7xWj4kXraDy-nc0khtwv-vBj70FGCqbLbk84YeNvN43eTyPsqqXlfC3JUhrIj6ugVCL3gZMQhtwQ"}, JSON.stringify({ messageType: 1, roomId: this.roomId, sender: this.sender, message: this.message }));
 					this.message = '';
 				},
 				recvMessage: function (recv) {
@@ -82,13 +82,13 @@
 
 		function connect() {
 			// pub/sub event
-			ws.connect({ Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJja2Roa2R3bnMiLCJhdXRoIjoiIiwiZXhwIjoxNjY1MjA3MzY0fQ.fxYJGZL1LG7jOitcenQlABevQ8NSe39ZJe3DOlNVhCABCI6Osg09MVeChwxZbl53_u5S2H0OjQsvH5ihgaguSQ" }, function (frame) {
+			ws.connect({ Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY1MjcxNjgwfQ.cEjjnwJW5U7xWj4kXraDy-nc0khtwv-vBj70FGCqbLbk84YeNvN43eTyPsqqXlfC3JUhrIj6ugVCL3gZMQhtwQ" }, function (frame) {
 				ws.subscribe("/topic/chat/room/" + vm.$data.roomId, function (message) {
 					console.log("RoomId:" + vm.$data.roomId);
 					var recv = JSON.parse(message.body);
 					vm.recvMessage(recv);
 				});
-				ws.send("/app/chat/message", {Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJja2Roa2R3bnMiLCJhdXRoIjoiIiwiZXhwIjoxNjY1MjA3MzY0fQ.fxYJGZL1LG7jOitcenQlABevQ8NSe39ZJe3DOlNVhCABCI6Osg09MVeChwxZbl53_u5S2H0OjQsvH5ihgaguSQ"}, JSON.stringify({ messageType: 0, roomId: vm.$data.roomId, sender: vm.$data.sender }));
+				ws.send("/app/chat/message", {Authorization: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MzIiLCJhdXRoIjoiUk9MRV9VU0VSIiwiZXhwIjoxNjY1MjcxNjgwfQ.cEjjnwJW5U7xWj4kXraDy-nc0khtwv-vBj70FGCqbLbk84YeNvN43eTyPsqqXlfC3JUhrIj6ugVCL3gZMQhtwQ"}, JSON.stringify({ messageType: 0, roomId: vm.$data.roomId, sender: vm.$data.sender }));
 			}, function (error) {
 				if (reconnect++ <= 5) {
 					setTimeout(function () {

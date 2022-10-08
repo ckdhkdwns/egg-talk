@@ -1,6 +1,9 @@
 package eggtalk.eggtalk.entity;
 
 import lombok.*;
+
+import java.time.LocalDateTime;
+
 import javax.persistence.*;
 
 @Entity
@@ -27,4 +30,8 @@ public class ChatMessage extends BaseTime {
     
     @Column(name = "message", length = 1000)
     private String message;
+
+    @Column(name = "created_date", length = 20)
+    private LocalDateTime createdDate;
+
 }

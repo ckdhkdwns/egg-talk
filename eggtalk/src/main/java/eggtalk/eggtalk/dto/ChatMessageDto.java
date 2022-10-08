@@ -3,6 +3,8 @@ package eggtalk.eggtalk.dto;
 import eggtalk.eggtalk.entity.ChatMessage;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -29,7 +31,10 @@ public class ChatMessageDto {
     @Size(min = 1, max = 1000)
     private String message;
 
-    
+    @NotNull
+    @Size(min = 1, max = 20)
+    private LocalDateTime createdDate;
+
    public static ChatMessageDto from(ChatMessage chatMessage) {
       if(chatMessage == null) return null;
 
@@ -38,6 +43,7 @@ public class ChatMessageDto {
               .roomId(chatMessage.getRoomId())
               .sender(chatMessage.getSender())
               .message(chatMessage.getMessage())
+              .createdDate(chatMessage.getCreatedDate())
               .build();
    }
 }

@@ -363,6 +363,9 @@
 `/src/main/resources/templates/chattest.html`
 [Link](https://github.com/ckdhkdwns/egg-talk/blob/api/eggtalk/src/main/resources/templates/chattest.html)
 
+#### GET Params
+`token`, `roomId`
+
 
 ## Versions
 
