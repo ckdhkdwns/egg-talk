@@ -46,18 +46,18 @@ function Main() {
     }
 
     const { token }: any = JSON.parse(localStorage.getItem("token")!);
-    // axios
-    //   .get(API_URL + "/auth/me", {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   })
-    //   .then(function (response: AxiosResponse) {
-    //     setUser(response.data);
-    //   })
-    //   .catch((error: any) => {
-    //     console.log("error at /user/me", error);
-    //   });
+    axios
+      .get(API_URL + "/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(function (response: AxiosResponse) {
+        setUser(response.data);
+      })
+      .catch((error: any) => {
+        console.log("error at /user/me", error);
+      });
   }, [isLogin, navigate, setUser]);
 
   return isLogin ? (
