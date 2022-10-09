@@ -3,6 +3,9 @@ import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { lightTheme, darkTheme } from "./Theme";
 import { useRecoilValue } from "recoil";
 import { isDarkAtom } from "./atoms";
+import ReactModal from "react-modal";
+
+ReactModal.setAppElement("#root");
 
 function App() {
   const isDark = useRecoilValue(isDarkAtom);
@@ -65,12 +68,17 @@ const GlobalStyle = createGlobalStyle`
     border-spacing: 0;
   }
   * {
+    user-select: none;
     box-sizing: border-box;
+    font-family: "Noto Sans KR",sans-serif;
   }
   body {
-    font-family: 'Source Sans Pro', sans-serif;
+    display: "flex"; 
+    flex-direction: "column";
+    font-family: "Noto Sans KR",sans-serif;
     background-color:${(props) => props.theme.bgColor};
-    color:${(props) => props.theme.textColor}
+    color:${(props) => props.theme.textColor};
+    transition: 0.2s background-color, 0.2s color;
   }
   a {
     text-decoration:none;
