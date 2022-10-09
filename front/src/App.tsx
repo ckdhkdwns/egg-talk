@@ -3,17 +3,17 @@ import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { lightTheme, darkTheme } from "./Theme";
 import { useRecoilValue } from "recoil";
 import { isDarkAtom } from "./atoms";
-import ReactModal from "react-modal";
-
-ReactModal.setAppElement("#root");
+import { ModalProvider } from "styled-react-modal";
 
 function App() {
   const isDark = useRecoilValue(isDarkAtom);
   return (
     <>
       <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-        <GlobalStyle />
-        <Router />
+        <ModalProvider>
+          <GlobalStyle />
+          <Router />
+        </ModalProvider>
       </ThemeProvider>
     </>
   );
