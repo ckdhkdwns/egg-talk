@@ -1,15 +1,16 @@
 import axios, { AxiosResponse } from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { isLoginAtom } from "../atoms";
+import { API_URL } from "../api";
+import { isLoginAtom, userInfoAtom } from "../atoms";
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 935px;
+  max-width: 450px;
   width: 100%;
   margin: 0 auto;
   padding: 100px 0;
@@ -19,8 +20,10 @@ const Container = styled.div`
   width: 70%;
   margin: 0 auto;
 `;
-const MyProfile = styled.h2`
-  margin: 0 0 3rem 0;
+const Header = styled.h2`
+  margin: 0 0 1rem 0;
+  font-family: "Noto Sans KR";
+  font-weight: 500;
 `;
 const UpdateForm = styled.form`
   width: 100%;
@@ -71,22 +74,6 @@ const ErrorMessageArea = styled.div`
   color: ${(props) => props.theme.redTextColor};
 `;
 
-/* const user = {
-  authorityDtoSet: [],
-  userId: "juyeolyoon",
-  username: "juyeolyoon",
-  email: "juyeolyoon@gmail.com",
-  gender: 0,
-}; */
-
-type userData = {
-  authorityDtoSet: [];
-  userId: string;
-  username: string;
-  email: string;
-  gender: number;
-} | null;
-
 type FormData = {
   username: string;
   email: string;
@@ -94,57 +81,45 @@ type FormData = {
 
 function UserInfo() {
   const navigate = useNavigate();
+  const userInfo = useRecoilValue(userInfoAtom);
+  const setUser = useSetRecoilState(userInfoAtom);
   const isLogin = useRecoilValue(isLoginAtom);
-  const [user, setUser] = useState<userData>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
 
-  // 주분싸 테스트
-
-  axios
-    .get(
-      "https://raw.githubusercontent.com/RJ-Stony/JuBoonSSa/996719ac79dacc3bad566008aa7d8c99e57123cb/sam_stock.json"
-    )
-    .then(function (response: AxiosResponse) {
-      console.log(response);
-    })
-    .catch((error: any) => {
-      console.log("error:", error);
-    });
-
   useEffect(() => {
     // if token doesn't exist or is empty string, let client login
     if (!isLogin) {
       navigate("/");
-      return;
     }
-    const { token }: any = JSON.parse(localStorage.getItem("token")!);
-    axios
-      .get("https://egg-talk-server.run.goorm.io/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(function (response: AxiosResponse) {
-        setUser(response.data);
-        // console.log(response);
-      })
-      .catch((error: any) => {
-        console.log("error:", error);
-      });
-  }, [isLogin, navigate]);
+    if (!userInfo) {
+      const { token }: any = JSON.parse(localStorage.getItem("token")!);
+      axios
+        .get(API_URL + "/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(function (response: AxiosResponse) {
+          setUser(response.data);
+        })
+        .catch((error: any) => {
+          console.log("error at /user/me", error);
+        });
+    }
+  });
 
   const onValid = (data: FormData) => {
     console.log(data);
   };
 
-  return isLogin ? (
+  return userInfo ? (
     <Wrapper>
       <Container>
-        <MyProfile>내 프로필</MyProfile>
+        <Header>프로필 수정하기</Header>
         <UpdateForm onSubmit={handleSubmit(onValid)}>
           <Label>이름</Label>
           <Input
@@ -152,7 +127,7 @@ function UserInfo() {
               required: "이름을 입력해주세요.",
               maxLength: { value: 15, message: "이름이 너무 깁니다" },
             })}
-            value={user?.username || ""}
+            value={userInfo?.username || ""}
           />
           <Label>이메일</Label>
           <Input
@@ -165,10 +140,13 @@ function UserInfo() {
                 message: "이메일 형식에 맞지 않습니다.",
               },
             })}
-            value={user?.email || ""}
+            value={userInfo?.email || ""}
           />
           <Label>성별</Label>
-          <Input value={user?.gender === 0 ? "남성" : "여성" || ""} readOnly />
+          <Input
+            value={userInfo?.gender === 0 ? "여성" : "남성" || ""}
+            readOnly
+          />
           <EditBtn>수정하기</EditBtn>
 
           {errors.username ? (
