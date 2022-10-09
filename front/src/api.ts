@@ -1,7 +1,7 @@
 export const API_URL = "https://egg-talk-server.run.goorm.io";
 
 export type LoginFormData = {
-  userId: string;
+  username: string;
   password: string;
 };
 
