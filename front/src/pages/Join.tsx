@@ -2,19 +2,26 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import { isLoginAtom } from "../atoms";
 import Logo from "../components/Logo";
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  width: 50%;
+  margin: 0 auto;
+  padding: 100px 0;
+  min-height: 101vh;
 `;
 const Form = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   margin: 0 auto;
 `;
 const Input = styled.input`
@@ -24,13 +31,27 @@ const Input = styled.input`
   margin-bottom: 0.5rem;
   border-radius: 3px;
   box-shadow: rgb(15 15 15 / 20%) 0px 0px 0px 1px inset;
-  background: rgba(242, 241, 238, 0.6);
+  background: ${(props) => props.theme.inputColor};
+  color: rgba(0, 0, 0, 0.87);
   font-size: 0.9rem;
   border: none;
   outline: none;
 `;
+const RadioContainer = styled.div`
+  display: flex;
+  align-items: center;
+  height: 20px;
+  margin: 10px;
+`;
+const Radio = styled.input``;
+const GenderLabel = styled.div`
+  color: ${(props) => props.theme.textColor};
+  font-size: 0.9rem;
+  margin-right: 10px;
+  margin-left: 5px;
+`;
 const Label = styled.label`
-  color: rgba(55, 53, 47, 0.65);
+  color: ${(props) => props.theme.subTextColor};
   font-size: 12px;
   font-family: "Noto Sans KR", sans-serif;
 `;
@@ -49,7 +70,7 @@ const SignUpBtn = styled.button`
   color: white;
   cursor: pointer;
   transition: 0.1s background-color;
-
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   :hover {
     background-color: #525e66;
   }
@@ -58,13 +79,14 @@ const ErrorMessageArea = styled.div`
   font-size: 0.75rem;
   margin-top: 1rem;
   line-height: 1rem;
-  color: red;
+  color: ${(props) => props.theme.redTextColor};
 `;
 
 type FormData = {
   username: string;
   password: string;
-  nickname: string;
+  email: string;
+  gender: string;
 };
 
 function Join() {
@@ -75,21 +97,21 @@ function Join() {
   } = useForm<FormData>();
   const [isValid, setIsValid] = useState(true);
   const navigate = useNavigate();
+  const isLogin = useRecoilValue(isLoginAtom);
 
   const onValid = async (data: FormData) => {
     // console.log(data);
     axios
-      .post("https://egg-talk-server.run.goorm.io/api/signup", {
-        username: data.username,
-        password: data.password,
-        nickname: data.nickname,
+      .post("https://egg-talk-server.run.goorm.io/users", {
+        ...data,
+        gender: data.gender === "male" ? 0 : 1,
       })
       .then(function (response) {
         console.log(response);
-        navigate("/");
+        navigate("/login");
       })
       .catch(function (error) {
-        console.log(error.response.data);
+        console.log(error);
         // Case 1. Unauthorized
         error.request.status === 409 && setIsValid(false);
         //Case 2. Internal server error
@@ -101,8 +123,8 @@ function Join() {
 
   useEffect(() => {
     // if token exist
-    if (localStorage.getItem("token") && localStorage.getItem("token") !== "")
-      navigate("/chatroom");
+    // if (localStorage.getItem("token") && localStorage.getItem("token") !== "")
+    isLogin && navigate("/");
   });
 
   return (
@@ -131,29 +153,51 @@ function Join() {
             minLength: { value: 8, message: "비밀번호가 너무 짧습니다" },
             maxLength: { value: 20, message: "비밀번호가 너무 깁니다" },
             pattern: {
-              value: /^[A-Za-z0-9].{5,20}$/,
+              value: /^[A-Za-z0-9].{8,20}$/,
               message:
-                "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.",
+                "비밀번호는 8~20자 영문 대 소문자, 숫자, 특수문자를 사용하세요.",
             },
           })}
           type="password"
           placeholder="비밀번호를 입력하세요."
         />
-        <Label>닉네임</Label>
+        <Label>이메일</Label>
         <Input
-          {...register("nickname", {
-            required: "닉네임을 입력해주세요.",
-            maxLength: { value: 15, message: "닉네임가 너무 깁니다" },
+          {...register("email", {
+            required: "이메일를 입력해주세요.",
+            minLength: { value: 5, message: "이메일 너무 짧습니다" },
+            maxLength: { value: 20, message: "이메일 너무 깁니다" },
+            pattern: {
+              value: /^[A-Za-z0-9].{5,20}$/,
+              message: "이메일 형식에 맞지 않습니다.",
+            },
           })}
-          placeholder="닉네임을 입력하세요."
+          placeholder="이메일을 입력하세요."
         />
+        <Label>성별</Label>
+        <RadioContainer>
+          <Radio
+            {...register("gender", { required: "성별을 입력해주세요." })}
+            type="radio"
+            value="male"
+          />
+          <GenderLabel>남자</GenderLabel>
+          <Radio
+            {...register("gender", { required: "성별을 입력해주세요." })}
+            type="radio"
+            value="female"
+          />
+          <GenderLabel>여자</GenderLabel>
+        </RadioContainer>
         <SignUpBtn>가입하기</SignUpBtn>
         {errors.username ? (
           <ErrorMessageArea>{errors.username.message}</ErrorMessageArea>
         ) : errors.password ? (
           <ErrorMessageArea>{errors.password.message}</ErrorMessageArea>
-        ) : errors.nickname ? (
-          <ErrorMessageArea>{errors.nickname.message}</ErrorMessageArea>
+        ) : errors.email ? (
+          <ErrorMessageArea>{errors.email.message}</ErrorMessageArea>
+        ) : errors.gender ? (
+          <ErrorMessageArea>{errors.gender.message}</ErrorMessageArea>
         ) : !isValid ? (
           <ErrorMessageArea>
             이미 존재하는 아이디(로그인 전용 아이디)입니다. 다른 아이디를
