@@ -76,6 +76,7 @@ const ErrorMessageArea = styled.div`
 
 type FormData = {
   username: string;
+  password: string;
   email: string;
 };
 
@@ -114,6 +115,23 @@ function UserInfo() {
 
   const onValid = (data: FormData) => {
     console.log(data);
+    const { token }: any = JSON.parse(localStorage.getItem("token")!);
+    axios
+      .put(
+        API_URL + `/users/${userInfo?.username}`,
+        { ...data, username: userInfo?.username },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return userInfo ? (
@@ -122,13 +140,7 @@ function UserInfo() {
         <Header>프로필 수정하기</Header>
         <UpdateForm onSubmit={handleSubmit(onValid)}>
           <Label>이름</Label>
-          <Input
-            {...register("username", {
-              required: "이름을 입력해주세요.",
-              maxLength: { value: 15, message: "이름이 너무 깁니다" },
-            })}
-            value={userInfo?.username || ""}
-          />
+          <Input placeholder={userInfo?.username || ""} readOnly />
           <Label>이메일</Label>
           <Input
             {...register("email", {
@@ -140,12 +152,21 @@ function UserInfo() {
                 message: "이메일 형식에 맞지 않습니다.",
               },
             })}
-            value={userInfo?.email || ""}
+            placeholder={userInfo?.email || ""}
           />
           <Label>성별</Label>
           <Input
-            value={userInfo?.gender === 0 ? "여성" : "남성" || ""}
+            placeholder={userInfo?.gender === 0 ? "여성" : "남성" || ""}
             readOnly
+          />
+
+          <Label>비밀번호</Label>
+          <Input
+            {...register("password", {
+              required: "This is Required",
+            })}
+            type="password"
+            placeholder="비밀번호를 입력하세요"
           />
           <EditBtn>수정하기</EditBtn>
 
