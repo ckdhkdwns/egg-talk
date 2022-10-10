@@ -7,7 +7,6 @@ export type LoginFormData = {
 
 export type userData = {
   authorityDtoSet: [];
-  userId: string;
   username: string;
   email: string;
   gender: number;
@@ -15,7 +14,6 @@ export type userData = {
 
 export type TypeRoom = {
   createdDate?: string;
-  creatorId?: string;
   modifiedDate?: string;
   roomId?: number;
   roomName?: string;
@@ -27,7 +25,6 @@ export type TypeMessage = {
   id: number;
   messageType: number;
   roomId: number;
-  userId: number;
   username: string;
 };
 
