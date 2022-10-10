@@ -46,11 +46,11 @@
             ws.subscribe("/topic/chat/room/" + data.roomId, function (message) {
                 var recv = JSON.parse(message.body);
                 data.messages.push({
-                    name: recv.sender,
-                    content: recv.message,
+                    name: recv.username,
+                    content: recv.content,
                     createdDate: recv.createdDate
                 });
-                appendMessageToBoard(recv.sender, recv.message, recv.createdDate);
+                appendMessageToBoard(recv.username, recv.content, recv.createdDate);
             });
             ws.send("/app/chat/message", {
                 Authorization: data.token
@@ -70,7 +70,18 @@
             }
         });
     }
-
+    
+    function disconnectServer() {
+        ws.send("/app/chat/message", {
+            Authorization: data.token
+        },
+            JSON.stringify({
+                messageType: 2,
+                roomId: data.roomId,    
+        }));
+        ws.disconnect();
+    }
+    
     function sendMessage() {
         ws.send("/app/chat/message", {
             Authorization: data.token
@@ -78,7 +89,7 @@
             JSON.stringify({
                 messageType: 1,
                 roomId: data.roomId,
-                message: query(".input-message").value
+                content: query(".input-message").value
             }));
     }
 
@@ -91,12 +102,12 @@
                         content: "",
                         date: ""
                     }
-                    message.name = m.sender;
-                    message.content = m.message;
+                    message.name = m.username;
+                    message.content = m.content;
                     message.date = m.createdDate;
                     data.messages.push(message);
 
-                    appendMessageToBoard(m.sender, m.message, m.createdDate);
+                    appendMessageToBoard(m.username, m.content, m.createdDate);
                 }
             });
         

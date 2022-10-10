@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import eggtalk.eggtalk.entity.User;
 
-public interface UserRepository extends JpaRepository<User, String> {
+public interface UserRepository extends JpaRepository<User, Integer> {
     @EntityGraph(attributePaths = "authorities")
-    Optional<User> findOneWithAuthoritiesByUserId(String userId);
+    Optional<User> findOneWithAuthoritiesByUserId(Integer userId);
 
-    User findByUserId(String userId);
+    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findOneWithAuthoritiesByUsername(String username);
+
+    User findByUserId(Integer userId);
+    User findByUsername(String username);
 }

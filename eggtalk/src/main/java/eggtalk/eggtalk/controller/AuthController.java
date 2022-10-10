@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import eggtalk.eggtalk.dto.LoginDto;
 import eggtalk.eggtalk.dto.TokenDto;
 import eggtalk.eggtalk.dto.UserDto;
+
+
 import eggtalk.eggtalk.jwt.JwtFilter;
 import eggtalk.eggtalk.jwt.TokenProvider;
+
 import eggtalk.eggtalk.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -32,14 +35,21 @@ public class AuthController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserService userService;
-
+    
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @PostMapping("")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
-
+        // UserDto user = userService.getUserInfoByUsername(loginDto.getUsername());
+        // if(user.equals(null)) {
+        //     throw new NotFoundMemberException("존재하지 않는 유저입니다.");
+        // }
+        // if (!passwordEncoder.matches(passwordEncoder.encode(loginDto.getPassword()), user.getPassword())) {
+        //     throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+        // }
+        
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getUserId(), loginDto.getPassword());
+                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -55,9 +65,8 @@ public class AuthController {
     /** 토큰의 소유자 유저 정보 가져오기 */
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(HttpServletRequest request) {
-        String userId = tokenProvider.getUserPk(resolveToken(request));
 
-        return ResponseEntity.ok(userService.getUserInfoByUserId(userId));
+        return ResponseEntity.ok(userService.getMyUserWithAuthorities());
     }
 
     //request header에서 토큰 정보를 꺼내옴

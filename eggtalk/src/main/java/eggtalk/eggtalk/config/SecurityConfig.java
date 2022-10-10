@@ -85,12 +85,9 @@ public class SecurityConfig {
                 /* */
                 .authorizeRequests()
 
-                .antMatchers("/auth/**").permitAll()
-                .antMatchers("/user").permitAll()
-                .antMatchers("/chat/**").permitAll()
-                .antMatchers("/static/**").permitAll()
-                .antMatchers("/stomp/**").permitAll()
-                .antMatchers("/ws/**").permitAll()
+                .antMatchers("/").permitAll()
+                .antMatchers("/**").permitAll()
+
                 .anyRequest().authenticated()
 
                 .and()

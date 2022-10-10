@@ -1,9 +1,10 @@
 package eggtalk.eggtalk.entity;
 
 import lombok.*;
-import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "user_room")
@@ -12,20 +13,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRoom {
+@IdClass(UserRoom.class)
+public class UserRoom implements Serializable {    
 
     @Id
-    @Column(name = "id")
-    @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(name = "user_id")
-    private String userId;
+    @Column(name = "user_id") 
+    private Integer userId;
 
-    @Column(name = "room_id")
-    private Long roomId;
-
-    @Column(name = "room_name")
-    private String roomName;
+    @Id
+    @Column(name = "room_id") 
+    private Integer roomId;
 }

@@ -14,6 +14,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+import eggtalk.eggtalk.repository.UserRepository;
+
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,15 +27,19 @@ public class TokenProvider implements InitializingBean {
 
    private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
    private static final String AUTHORITIES_KEY = "auth";
+   private static final String USER_ID = "userId";
    private final String secret;
    private final long tokenValidityInMilliseconds;
    private Key key;
+   private final UserRepository userRepository;
 
    public TokenProvider(
       @Value("${jwt.secret}") String secret,
-      @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+      @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
+      UserRepository userRepository) {
       this.secret = secret;
       this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+      this.userRepository = userRepository;
    }
 
    @Override
@@ -53,6 +59,7 @@ public class TokenProvider implements InitializingBean {
 
       return Jwts.builder()
          .setSubject(authentication.getName())
+         .claim(USER_ID, userRepository.findByUsername(authentication.getName()).getUserId())
          .claim(AUTHORITIES_KEY, authorities)
          .signWith(key, SignatureAlgorithm.HS512)
          .setExpiration(validity)
@@ -78,14 +85,14 @@ public class TokenProvider implements InitializingBean {
       return new UsernamePasswordAuthenticationToken(principal, token, authorities);
    }
 
-   public String getUserPk(String token) {
+   public Integer getUserId(String token) {
       Claims claims = Jwts
               .parserBuilder()
               .setSigningKey(key)
               .build()
               .parseClaimsJws(token)
               .getBody();
-      return claims.getSubject();
+      return (Integer)claims.get(USER_ID);
   }
 
    //토큰의 유효성 검증

@@ -4,27 +4,21 @@ import lombok.*;
 
 import javax.persistence.*;
 
-
-
 @Entity
-@Table(name = "chat_room")
+@Table(name = "room")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatRoom extends BaseTime {
+public class Room extends BaseTime {
 
     @Id
     @Column(name = "room_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roomId;
-
-    @Column(name = "creator_id", length = 100)
-    private String creatorId;
+    private Integer roomId;
 
     @Column(name = "room_name", length = 100)
     private String roomName;
-
 
 }

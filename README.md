@@ -1,135 +1,121 @@
 # Egg Talk
 
-<b>Temporary Server URL</b> `https://egg-talk-server.run.goorm.io`  
+> Temporary Server URL `https://egg-talk-server.run.goorm.io`  
 
----
 
-**Auth Controller** `/auth/**`  
-- [로그인](#로그인)  
-- [현재 유저 정보 불러오기](#현재-유저-정보-가져오기)  
+## Table of content
 
-**User Controller** `/users/**`  
-- [회원가입](#회원가입)  
-- [유저 정보 수정하기](#유저-정보-수정하기)  
-- [유저 채팅방 목록 가져오기](#유저-채팅방-목록-가져오기)
-- [특정 유저 정보 가져오기](#특정-유저-정보-가져오기)
+- [DB Model](#db-model)
+- [Usage](#usage)
+    - `Auth Controller` `.../auth`
+        - [로그인](#로그인)  
+        - [현재 유저 정보 불러오기](#현재-유저-정보-가져오기)  
+    - `User Controller` `.../users`
+        - [회원가입](#회원가입)  
+        - [유저 정보 수정하기](#유저-정보-수정하기)  
+        - [유저가 접속해있는 채팅방 리스트 가져오기](#유저가-접속해있는-채팅방-리스트-가져오기)
+        - [특정 유저 정보 가져오기](#특정-유저-정보-가져오기)
+    - `Room Controller` `.../rooms`
+        - [채팅방 생성하기](#채팅방-생성하기)
+        - [모든 채팅방 목록 가져오기](#모든-채팅방-목록-가져오기)
+        - [채팅방 내의 메세지 리스트 가져오기](#채팅방-내의-메세지-리스트-가져오기)
+        - [채팅방 내의 유저 리스트 가져오기](#채팅방에-접속해-있는-유저-리스트-가져오기)
+## DB model
+![db](https://user-images.githubusercontent.com/66898263/194763686-a649e3a2-7fb0-4735-b77c-bdae5ec988eb.svg)
 
-**Room Controller** `/rooms/**`  
-- [채팅방 생성하기](#채팅방-생성하기)
-- [모든 채팅방 목록 가져오기](#모든-채팅방-목록-가져오기)
-- [채팅방 내의 메세지 가져오기](#채팅방-내의-메세지-가져오기)
 
----
+## Usage
+
+### Data Types
+각 컬럼들의 데이터 타입이다. 
+| Column | Data type | Minimum length | Maximum length |
+|:---:|:---:|:---:|:---:|
+| `username` | `String` | `3 ` |  `50 ` |
+| `password` | `String` | `8 ` |  `100 ` |
+| `gender` | `Boolean` | `1 ` |  `1 ` |
+| `email` | `String` | `5 ` |  `50 ` |
+| `roomId` | `Integer` | `1 ` |  `11 ` |
+| `roomName` | `String` | `5 ` |  `50 ` |
+| `messageType` | `Integer` | `1 ` |  `1 ` |
+| `content` | `String` | `1 ` |  `1000 ` |
+
 
 ### 로그인
+아이디와 비밀번호를 통해 토큰을 발급받음.
 
+####  Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `POST` | `/auth` | `True` |
+| `POST` | `/auth` | `False` |
 
-- 아이디와 비밀번호를 통해 토큰을 발급받음.
-
-#### Request body
-```javascript
+#### Request
+```json
 {
-    "userId": user_id,
-    "password": user_password,
+    "userId": "ckdhkdwns",
+    "password": "1q2w3e4r",
 }
 ```
 
-#### Response body
-```javascript
+#### Response
+```json
 {
-    "token": token_value
+    "token": "token_value"
 }
 ```
----
+
+<br/><br/>
 
 ### 현재 유저 정보 가져오기
+헤더의 토큰에 담긴 유저의 정보를 가져온다.
 
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
 | `GET` | `/auth/me` | `True` |
 
-- 헤더에 토큰값을 추가해서 요청하면 서버에서는 토큰을 통해 사용자의 정보를 응답한다.
-#### Requset header
+#### Request 
 ```javascript
-{
-    ...
-    "Authorization": token
-}
+//skip
 ```
 
-#### Response body
-```javascript
+#### Response
+```json
 {
-    "userId": user_id,
-    "username": user_name,
-    "gender": user_gender,
-    "email": user_email
+    "username": "ckdhkdwns",
+    "gender": true,
+    "email": "test@test.com",
     "authorityDtoSet": [
         {
-            "authorityName": user_authority //유저의 권한 (ADMIN_USER: 관리자, ROLE_USER: 일반 유저)
+            "authorityName": "ROLE_USER"
         }
     ]
 }
 ```
----
+<br/><br/>
+
 ### 회원가입 
+`username`, `password`, `gender`, `email`을 통해 가입한다.
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
 | `POST` | `/users` | `False` |
 
-- 아이디, 비밀번호, 이름으로 간단한 회원가입 가능.  
-- 비밀번호는 영문자, 숫자를 각각 포함한 8~20자의 문자열이어야 함.  
-
-
-#### Request body
-```bash
+#### Request
+```json
 {
-    "userId": user_id,
-    "password": user_password,
-    "username": user_name,
-    "gender": user_gender,
-    "email: user_email
+    "username": "dbswnduf",
+    "password": "1q2w3e4r",
+    "gender": false,
+    "email": "wnduf@email.com"
 }
 ```
-#### Response body
+#### Response
 
-```javascript
+```json
 {
-    "userId": user_id,
-    "username": user_name,
-    "gender": user_gender,
-    "email": user_email
-    "authorityDtoSet": [
-        {
-            "authorityName": user_authority //유저의 권한 (ADMIN_USER: 관리자, ROLE_USER: 일반 유저)
-        }
-    ]
-}
-```
----
-
-### 특정 유저 정보 가져오기
-
-| Method | URL | Token Necessity |
-|:---:|:---:|:---:|
-| `GET` | `/users/{userId}` | `True` |
-
-- `userId`에 해당하는 유저의 정보를 가져온다.
-
-#### URL
-
-`.../users/test32`
-
-#### Response body
-```javascript
-{
-    "userId": "test32",
-    "username": "master2",
-    "gender": 0,
-    "email": "test2@test.com",
+    "username": "dbswnduf",
+    "gender": false,
+    "email": "wnduf@email.com"
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
@@ -137,27 +123,27 @@
     ]
 }
 ```
----
+<br/><br/>
 
 ### 특정 유저 정보 가져오기
 
+`username`에 해당하는 유저의 정보를 가져온다.
+
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `GET` | `/users/{userId}` | `True` |
+| `GET` | `/users/{username}` | `True` |
 
-- `userId`에 해당하는 유저의 정보를 가져온다.
+#### Example URL
 
-#### URL
+`.../users/ckdhkdwns`
 
-`.../users/test32`
-
-#### Response body
-```javascript
+#### Response
+```json
 {
-    "userId": "test32",
-    "username": "master2",
-    "gender": 0,
-    "email": "test2@test.com",
+    "username": "ckdhkdwns",
+    "gender": false,
+    "email": "zhdqks@naver.com",
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
@@ -165,163 +151,132 @@
     ]
 }
 ```
+<br/><br/>
 
---- 
 
 ### 유저 정보 수정하기
+- URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 유저 정보를 수정함.
+- 비밀번호, 이메일을 수정할 수 있다.
 
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `PUT` | `/users/{userId}` | `True` |
+| `PUT` | `/users/{username}` | `True` |
 
-- URL의 `userId`와 토큰의 `userId`가 일치하면 해당 아이디의 유저 정보를 수정함.
-- 비밀번호, 유저이름, 이메일을 수정할 수 있다.
-
-
-#### Requset body
-```javascript
+#### Requset
+```json
 {
-    "password": user_password,
-    "username": user_name,
-    "email": user_email
+    "password": "1q2w3e4r",
+    "email": "zhdqks@naver.com"
 }
 ```
 
-#### Response body
-```javascript
+#### Response
+```json
 {
-    "userId": user_id,
-    "username": updated_user_name,
-    "gender": user_gender,
-    "email": updated_user_email,
+    "username": "ckdhkdwns",
+    "gender": false,
+    "email": "zhdqks@naver.com",
     "authorityDtoSet": [
         {
-            "authorityName": user_authority //유저의 권한 (ADMIN_USER: 관리자, ROLE_USER: 일반 유저)
+            "authorityName": "ROLE_USER"
         }
     ]
 }
 ```
-
----
+<br/><br/>
 
 ### 모든 채팅방 목록 가져오기
+모든 채팅방 목록을 가져옴
 
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
 | `GET` | `/rooms` | `True` |
 
-- 모든 채팅방 목록을 가져옴
+
 
 #### Request
 ```javascript
-//생략  
+//skip
 ```
-
-#### Response body
-```javascript
-//test value
+#### Response
+```json
 [
-    ...
     {
-        "createdDate": "2022-10-04T13:38:50",
-        "roomId": 10,
-        "creatorId": "test32",
-        "roomName": "testterdf"
+        "createdDate": "2022-10-09T14:17:44",
+        "roomId": 3,
+        "roomName": "차왕준의 롤토체스"
     },
     {
-        "createdDate": "2022-10-04T13:53:51",
-        "roomId": 11,
-        "creatorId": "ckdhkdwns",
-        "roomName": "My room!"
+        "createdDate": "2022-10-09T14:16:39",
+        "roomId": 2,
+        "roomName": "hello123"
+    },
+    {
+        "createdDate": "2022-10-09T14:15:39",
+        "roomId": 1,
+        "roomName": "hello123"
     }
-    ...
 ]
 ```
----
+<br/><br/>
 
-### 유저 채팅방 목록 가져오기
+### 유저가 접속해있는 채팅방 리스트 가져오기
+URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 유저 정보를 가져옴.
 
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
-| `GET` | `/users/{userId}/rooms` | `True` |
+| `GET` | `/users/{username}/rooms` | `True` |
 
-- URL의 `userId`와 토큰의 `userId`가 일치하면 해당 아이디의 유저 정보를 가져옴.
+#### Example URL
 
-### URL
+`.../users/ckdhkdwns/rooms`
 
-`.../users/test32/rooms`
-
-### Response Body 
-
-```javascript
-// 
+#### Response
+```json
 [
-    ...
     {
-        "createdDate": "2022-10-04T13:38:50",
-        "roomId": 10,
-        "creatorId": "test32",
-        "roomName": "testterdf"
+        "createdDate": "2022-10-09T14:16:39",
+        "roomId": 2,
+        "roomName": "hello123"
     },
-    ...
+    {
+        "createdDate": "2022-10-09T14:17:44",
+        "roomId": 3,
+        "roomName": "차왕준의 롤토체스"
+    }
 ]
 ```
-
----
-
-### 유저 채팅방 목록 가져오기
-
-| Method | URL | Token Necessity |
-|:---:|:---:|:---:|
-| `GET` | `/users/{userId}/rooms` | `True` |
-
-- URL의 `userId`와 토큰의 `userId`가 일치하면 해당 아이디의 유저 정보를 가져옴.
-
-### URL
-
-`.../users/test32/rooms`
-
-### Response Body 
-
-```javascript
-// 
-[
-    ...
-    {
-        "createdDate": "2022-10-04T13:38:50",
-        "roomId": 10,
-        "creatorId": "test32",
-        "roomName": "testterdf"
-    },
-    ...
-]
-```
+<br/><br/>
 
 ### 채팅방 생성하기
 
+채팅방을 생성한다.
+
+#### Info
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
 | `POST` | `/rooms` | `True` |
 
-- 채팅방을 생성한다.
-
-#### Request body
-```javascript
+#### Request
+```json
 {
     "roomName" : "My room!"
 }
 ```
-#### Response body
-```javascript
+#### Response
+```json
 {
-    "creatorId": "test32", // 토큰의 userId
-    "roomName": "My room!", // request header의  roomName
+    "createdDate": "2022-10-10T04:50:10.515197183",
+    "roomId": 6,
+    "roomName": "My room!"
 }
 ```
+<br/><br/>
 
----
-
-### 채팅방 내의 메세지 가져오기
+### 채팅방 내의 메세지 리스트 가져오기
 
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
@@ -329,36 +284,54 @@
 
 - 방 아이디를 통해 채팅 메세지들을 불러온다.
 
-#### URL
+#### Example URL
 `.../rooms/6/messages`
 
-#### Response body
-
-```javascript
+#### Response
+```json
 [
-    ...
     {
-        "createdDate": "2022-10-04T10:31:19",
-        "id": 4,
+        "id": 1,
+        "userId": 2,
+        "username": "ckdhkdwns",
+        "roomId": 3,
         "messageType": 0,
-        "roomId": 6,
-        "sender": "testuser",
-        "message": "testuser님이 입장하였습니다."
+        "content": "ckdhkdwns님이 입장하였습니다.",
+        "createdDate": "2022-10-09T14:31:42"
+    },
+]
+```
+<br/><br/>
+
+### 채팅방에 접속해 있는 유저 리스트 가져오기
+| Method | URL | Token Necessity |
+|:---:|:---:|:---:|
+| `GET` | `/rooms/{roomId}/users` | `True` |
+- 채팅방에 접속해 있는 유저의 정보들을 가져온다.
+
+#### Example URL
+`.../rooms/3/users`
+
+#### Response
+```json
+[
+    {
+        "createdDate": "2022-10-09T14:15:20",
+        "username": "ckdhkdwns",
+        "gender": false,
+        "email": "zhdqks@naver.com"
     },
     {
-        "createdDate": "2022-10-04T13:17:31",
-        "id": 23,
-        "messageType": 1,
-        "roomId": 5,
-        "sender": "test32",
-        "message": "asdasdasd"
-    },
-    ...
+        "createdDate": "2022-10-09T14:47:36",
+        "username": "juyeolyoon",
+        "gender": false,
+        "email": "different"
+    }
 ]
 ```
 
----
-그리고 웹소켓 예시 코드...  
+
+## Websocket client code
 
 `/src/main/resources/templates/chattest.html`
 [Link](https://github.com/ckdhkdwns/egg-talk/blob/api/eggtalk/src/main/resources/templates/chattest.html)
@@ -372,6 +345,4 @@
 - <b>node.js</b> 16.17.1
 - <b>jdk</b> 17.0.4 (openjdk)
 - <b>springboot</b> 2.7.4
-
-## Plan
 

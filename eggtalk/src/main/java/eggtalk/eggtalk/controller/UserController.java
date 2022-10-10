@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import eggtalk.eggtalk.dto.UserDto;
-import eggtalk.eggtalk.entity.ChatRoom;
+import eggtalk.eggtalk.entity.Room;
 import eggtalk.eggtalk.exception.DuplicateMemberException;
 import eggtalk.eggtalk.exception.InvalidPasswordException;
 import eggtalk.eggtalk.exception.InvalidUserException;
@@ -40,25 +40,25 @@ public class UserController {
     }
 
     /** 특정 유저 정보 불러오기 */
-    @GetMapping("/{userId}")
+    @GetMapping("/{username}")
     public ResponseEntity<UserDto> getUser(
-            @PathVariable String userId,
+            @PathVariable String username,
             HttpServletRequest request) {
-        return ResponseEntity.ok(userService.getUserWithAuthorities(userId));
+        return ResponseEntity.ok(userService.getUserWithAuthorities(username));
     }
 
     /** 유저 정보 수정하기 (Update) */
-    @PutMapping("/{userId}")
+    @PutMapping("/{username}")
     public ResponseEntity<UserDto> updateUser(
-            @PathVariable String userId,
+            @PathVariable String username,
             @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.updateUserInfo(userId, userDto));
+        return ResponseEntity.ok(userService.updateUserInfo(username, userDto));
     }
 
     /** 유저가 가지고 있는 방 목록 가져오기 */
-    @GetMapping("/{userId}/rooms")
-    public List<ChatRoom> getUserRooms(@PathVariable String userId) {
-        return chatService.findRoomIdByUserId(userId);
+    @GetMapping("/{username}/rooms")
+    public List<Room> getUserRooms(@PathVariable String username) {
+        return chatService.findRoomByUsername(username);
     }
 
     /*

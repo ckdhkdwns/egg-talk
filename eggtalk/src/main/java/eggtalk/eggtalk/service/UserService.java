@@ -1,6 +1,7 @@
 package eggtalk.eggtalk.service;
 
 import java.util.Collections;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,29 +17,30 @@ import eggtalk.eggtalk.exception.NotFoundMemberException;
 import eggtalk.eggtalk.repository.UserRepository;
 import eggtalk.eggtalk.util.SecurityUtil;
 import eggtalk.eggtalk.validation.PasswordValidator;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordValidator passwordValidator;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            PasswordValidator passwordValidator) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.passwordValidator = passwordValidator;
-    }
-
     /** 유저 아이디로 유저 정보 가져오기 */
     @Transactional
-    public UserDto getUserInfoByUserId(String userId) {
+    public UserDto getUserInfoByUserId(Integer userId) {
         return UserDto.from(userRepository.findByUserId(userId));
+    }
+
+    /** 유저 이름으로 유저 정보 가져오기 */
+    @Transactional
+    public UserDto getUserInfoByUsername(String username) {
+        return UserDto.from(userRepository.findByUsername(username));
     }
 
     @Transactional
     public UserDto signup(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByUserId(userDto.getUserId()).orElse(null) != null) {
+        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
         }
         if (passwordValidator.isValidPassword(userDto.getPassword())) {
@@ -46,42 +48,39 @@ public class UserService {
         }
 
         Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
-                .build();
-
+        .authorityName("ROLE_USER")
+        .build();
+        
         User user = User.builder()
-
-                .userId(userDto.getUserId())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .username(userDto.getUsername())
                 .gender(userDto.getGender())
-                .email(userDto.getEmail())
                 .authorities(Collections.singleton(authority))
-                .activated(true)
+                .email(userDto.getEmail())
                 .build();
 
         return UserDto.from(userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
-    public UserDto getUserWithAuthorities(String userId) {
-        return UserDto.from(userRepository.findOneWithAuthoritiesByUserId(userId).orElse(null));
+    public UserDto getUserWithAuthorities(String username) {
+        return UserDto.from(userRepository.findOneWithAuthoritiesByUsername(username).orElse(null));
     }
 
     @Transactional(readOnly = true)
     public UserDto getMyUserWithAuthorities() {
+        
         return UserDto.from(
-                SecurityUtil.getCurrentUserId()
-                        .flatMap(userRepository::findOneWithAuthoritiesByUserId)
+                SecurityUtil.getCurrentUsername()
+                        .flatMap(userRepository::findOneWithAuthoritiesByUsername)
                         .orElseThrow(() -> new NotFoundMemberException("유저를 찾을 수 없습니다.")));
     }
 
     @Transactional
-    public UserDto updateUserInfo(String userId, UserDto updateUserDto) {
-        if (SecurityUtil.getCurrentUserId().get().equals(userId)) {
-            User user = userRepository.findOneWithAuthoritiesByUserId(SecurityUtil.getCurrentUserId().get()).get();
+    public UserDto updateUserInfo(String username, UserDto updateUserDto) {
+        if (SecurityUtil.getCurrentUsername().get().equals(username)) {
+            User user = userRepository.findByUsername(username);
             user.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
-            user.setUsername(updateUserDto.getUsername());
             user.setEmail(updateUserDto.getEmail());
 
             return UserDto.from(userRepository.save(user));

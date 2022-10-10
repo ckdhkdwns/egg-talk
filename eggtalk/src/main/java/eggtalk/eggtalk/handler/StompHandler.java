@@ -20,10 +20,13 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        /** message의 토큰 유효성 검증 */
         if(accessor.getCommand() == StompCommand.CONNECT) {
             if(!tokenProvider.validateToken(accessor.getFirstNativeHeader("Authorization")))
-                throw new NotFoundMemberException("Member not found");
-        }
+                throw new NotFoundMemberException("Member not found");  
+        }   
         return message;
     }
+
+
 }
