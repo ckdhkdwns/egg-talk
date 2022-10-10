@@ -1,10 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { ReactComponent as LightIcon } from "../images/light_icon.svg";
-import { ReactComponent as DarkIcon } from "../images/dark_icon.svg";
 import { ReactComponent as LogoutIcon } from "../images/logout_icon.svg";
 import { ReactComponent as UserIcon } from "../images/userinfo_icon.svg";
-import { isDarkAtom, isLoginAtom, userInfoAtom } from "../atoms";
+import { isLoginAtom, userInfoAtom } from "../atoms";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import React from "react";
 import { userData } from "../api";
@@ -59,15 +57,11 @@ const RightItem = styled.div`
 `;
 
 function Navbar() {
-  const isDark = useRecoilValue(isDarkAtom);
-  const setIsDark = useSetRecoilState(isDarkAtom);
   const navigate = useNavigate();
   const isLogin = useRecoilValue(isLoginAtom);
   const setIsLogin = useSetRecoilState(isLoginAtom);
   const user = useRecoilValue<userData>(userInfoAtom);
   const setUser = useSetRecoilState(userInfoAtom);
-
-  const toggleTheme = () => setIsDark((prev) => !prev);
 
   const logout = () => {
     localStorage.setItem("token", "");
@@ -78,7 +72,7 @@ function Navbar() {
 
   return (
     <Wrapper>
-      <Link to={"/chat"}>
+      <Link to={"/"}>
         <LogoContainer>
           <LogoImg src="https://notion-emojis.s3-us-west-2.amazonaws.com/prod/svg-twitter/1f373.svg" />
           <LogoTitle>
@@ -99,15 +93,6 @@ function Navbar() {
               <LogoutIcon onClick={logout} />
             </RightItem>
           </>
-        )}
-        {isDark ? (
-          <RightItem onClick={toggleTheme}>
-            <DarkIcon />
-          </RightItem>
-        ) : (
-          <RightItem onClick={toggleTheme}>
-            <LightIcon />
-          </RightItem>
         )}
       </RightItems>
     </Wrapper>

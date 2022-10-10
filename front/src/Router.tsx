@@ -4,6 +4,7 @@ import Join from "./pages/Join";
 import Login from "./pages/Login";
 import UserInfo from "./pages/UserInfo";
 import Main from "./pages/Main";
+import DarkmodeBtn from "./components/DarkmodeBtn";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
         <Route path="/userinfo" element={<UserInfo />} />
         <Route path="/" element={<Main />} />
       </Routes>
+      <DarkmodeBtn />
     </BrowserRouter>
   );
 }
