@@ -6,7 +6,7 @@ import { useMediaQuery } from "react-responsive";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { LoginFormData } from "../api";
+import { API_URL, LoginFormData } from "../api";
 import { isLoginAtom } from "../atoms";
 import Logo from "../components/Logo";
 
@@ -124,20 +124,9 @@ function Login() {
   const onValid = async (data: LoginFormData) => {
     setIsFetching(true);
     axios
-      .post(
-        "https://egg-talk-server.run.goorm.io/auth",
-        { ...data },
-        {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-          },
-          responseType: "json",
-        }
-      )
+      .post(API_URL + "/auth", { ...data })
       .then((response: AxiosResponse) => {
         // console.log(response);
-        console.log("res.data.accessToken : ", response.data.token);
         setIsFetching(false);
         localStorage.setItem(
           "token",
@@ -173,7 +162,7 @@ function Login() {
         <Form onSubmit={handleSubmit(onValid)}>
           <Label>아이디</Label>
           <Input
-            {...register("userId", {
+            {...register("username", {
               required: "This is Required",
             })}
             placeholder="아이디를 입력하세요"
@@ -205,7 +194,7 @@ function Login() {
           <Label style={{ margin: "5px 0 0 3px" }}>
             <Link to={"/signup"}>가입하기</Link>
           </Label>
-          {errors.userId ? (
+          {errors.username ? (
             <ErrorMessageArea>아이디를 입력해 주세요.</ErrorMessageArea>
           ) : errors.password ? (
             <ErrorMessageArea>비밀번호를 입력해 주세요.</ErrorMessageArea>

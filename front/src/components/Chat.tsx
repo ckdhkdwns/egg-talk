@@ -26,8 +26,8 @@ const Wrapper = styled.div`
   height: 100%;
   background: #fff;
   position: relative;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-top-right-radius: 0.125rem;
+  border-bottom-right-radius: 0.125rem;
   border-left: 1px solid #0000003d;
 `;
 const Header = styled.div`
@@ -39,7 +39,7 @@ const Header = styled.div`
   height: 50px;
   position: relative;
   background: #66757f;
-  border-top-right-radius: 10px;
+  border-top-right-radius: inherit;
 `;
 const RoomName = styled.div`
   color: white;
@@ -66,6 +66,7 @@ const InputContainer = styled.div`
   height: 40px;
   min-height: 40px;
   padding: 6px;
+  background: #c0c1c1;
 `;
 const Form = styled.form`
   width: 100%;
@@ -79,15 +80,18 @@ const Input = styled.input`
   padding: 5px 10px;
 `;
 const SendBtn = styled.button`
-  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-left: 6px;
   border-radius: 2px;
   border: 0;
   outline: 0;
-  background-color: #dfdfdf;
+  background-color: #66757f;
+  cursor: pointer;
 
   &:hover {
-    background-color: lightgray;
+    background-color: #454d52;
   }
 `;
 
@@ -139,11 +143,14 @@ function Chat() {
         headers: { Authorization: token },
       })
       .then((res) => {
-        // console.log(res.data);
+        console.log(res.data);
         setMessages(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
       });
   };
-  function onSend(message: any, e: any) {
+  const onSend = (message: any, e: any) => {
     e.preventDefault();
     e.target[0].value = "";
 
@@ -156,9 +163,9 @@ function Chat() {
           id: messages.length,
           messageType: 1,
           roomId: roomId,
-          userId: userInfo.userId,
+          userId: 0,
           username: userInfo.username,
-          message: message.message,
+          content: message.message,
         },
       ]);
 
@@ -173,15 +180,13 @@ function Chat() {
         message: message.message,
       })
     );
-  }
+  };
 
   useEffect(() => {
     if (roomId !== 0) {
       enterRoom();
     }
   }, [roomId]);
-
-  console.log(messages);
 
   return (
     <Wrapper>
@@ -209,7 +214,7 @@ function Chat() {
             placeholder="메세지를 입력하세요."
           />
           <SendBtn type="submit">
-            <SendIcon fill="#4a4a4a" />
+            <SendIcon fill="#cccccc" />
           </SendBtn>
         </InputContainer>
       </Form>

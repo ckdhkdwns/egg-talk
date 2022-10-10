@@ -22,13 +22,13 @@ export type TypeRoom = {
 } | null;
 
 export type TypeMessage = {
+  content: string;
   createdDate: string;
   id: number;
   messageType: number;
   roomId: number;
-  userId: string;
+  userId: number;
   username: string;
-  message: string;
 };
 
 export const roomsTest = [
