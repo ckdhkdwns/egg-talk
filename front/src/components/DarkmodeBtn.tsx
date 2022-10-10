@@ -10,7 +10,7 @@ const Wrapper = styled.button<{ isDark: boolean }>`
   justify-content: center;
   align-items: center;
   position: fixed;
-  right: 78px;
+  right: 7vw;
   bottom: 19px;
   width: 136px;
   height: 44px;
