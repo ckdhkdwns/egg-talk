@@ -1,7 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { ReactComponent as LogoutIcon } from "../images/logout_icon.svg";
 import { ReactComponent as UserIcon } from "../images/userinfo_icon.svg";
+import { ReactComponent as ChatIcon } from "../images/chat_icon.svg";
 import { isLoginAtom, userInfoAtom } from "../atoms";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import React from "react";
@@ -51,6 +52,11 @@ const RightItem = styled.div`
   margin-left: 10px;
   cursor: pointer;
 
+  svg {
+    fill: ${(props) => props.theme.textColor};
+    fill-opacity: 0.8;
+  }
+
   &:hover {
     background: ${(props) => props.theme.hoverColor};
   }
@@ -62,6 +68,7 @@ function Navbar() {
   const setIsLogin = useSetRecoilState(isLoginAtom);
   const user = useRecoilValue<userData>(userInfoAtom);
   const setUser = useSetRecoilState(userInfoAtom);
+  const { pathname } = useLocation();
 
   const logout = () => {
     localStorage.setItem("token", "");
@@ -86,9 +93,16 @@ function Navbar() {
       <RightItems>
         {isLogin && (
           <>
-            <RightItem>
-              <UserIcon onClick={() => navigate("/userinfo")} />
-            </RightItem>
+            {pathname === "/" && (
+              <RightItem>
+                <UserIcon onClick={() => navigate("/userinfo")} />
+              </RightItem>
+            )}
+            {pathname === "/userinfo" && (
+              <RightItem>
+                <ChatIcon onClick={() => navigate("/")} />
+              </RightItem>
+            )}
             <RightItem>
               <LogoutIcon onClick={logout} />
             </RightItem>

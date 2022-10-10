@@ -1,7 +1,7 @@
 import { DefaultTheme } from "styled-components";
 
 export const darkTheme: DefaultTheme = {
-  bgColor: "#202124",
+  bgColor: "#1e1f21",
   textColor: "white",
   subTextColor: "#9aa0a6",
   redTextColor: "",
@@ -12,6 +12,8 @@ export const darkTheme: DefaultTheme = {
   tableHeaderColor: "white",
   tableBodyColor: "white",
   hoverColor: "#52525245",
+  incomingMessage: "#ab5353",
+  outgoingMessage: "#4f448f",
 };
 
 export const lightTheme: DefaultTheme = {
@@ -26,4 +28,6 @@ export const lightTheme: DefaultTheme = {
   tableHeaderColor: "white",
   tableBodyColor: "white",
   hoverColor: "#e6eef5",
+  incomingMessage: "#f7c7c7",
+  outgoingMessage: "#c1e4ec",
 };

@@ -15,5 +15,7 @@ declare module "styled-components" {
     tableHeaderColor: string;
     tableBodyColor: string;
     hoverColor: string;
+    incomingMessage: string;
+    outgoingMessage: string;
   }
 }

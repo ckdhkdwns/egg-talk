@@ -71,6 +71,7 @@ const GlobalStyle = createGlobalStyle`
     user-select: none;
     box-sizing: border-box;
     font-family: "Noto Sans KR",sans-serif;
+    letter-spacing: 0.3px;
   }
   body {
     display: "flex"; 
