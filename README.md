@@ -6,20 +6,28 @@
 ## Table of content
 
 - [DB Model](#db-model)
-- [Usage](#usage)
-    - `Auth Controller` `.../auth`
-        - [로그인](#로그인)  
-        - [현재 유저 정보 불러오기](#현재-유저-정보-가져오기)  
-    - `User Controller` `.../users`
-        - [회원가입](#회원가입)  
-        - [유저 정보 수정하기](#유저-정보-수정하기)  
-        - [유저가 접속해있는 채팅방 리스트 가져오기](#유저가-접속해있는-채팅방-리스트-가져오기)
-        - [특정 유저 정보 가져오기](#특정-유저-정보-가져오기)
-    - `Room Controller` `.../rooms`
-        - [채팅방 생성하기](#채팅방-생성하기)
-        - [모든 채팅방 목록 가져오기](#모든-채팅방-목록-가져오기)
-        - [채팅방 내의 메세지 리스트 가져오기](#채팅방-내의-메세지-리스트-가져오기)
-        - [채팅방 내의 유저 리스트 가져오기](#채팅방에-접속해-있는-유저-리스트-가져오기)
+- [Data types](#data-types)
+- `.../auth`
+    - [로그인](#로그인)  
+    - [현재 유저 정보 불러오기](#현재-유저-정보-가져오기)  
+- `.../users`
+    - [회원가입](#회원가입)  
+    - [유저 정보 수정하기](#유저-정보-수정하기)  
+    - [유저가 접속해있는 채팅방 리스트 가져오기](#유저가-접속해있는-채팅방-리스트-가져오기)
+    - [특정 유저 정보 가져오기](#특정-유저-정보-가져오기)
+- `.../rooms`
+    - [채팅방 생성하기](#채팅방-생성하기)
+    - [모든 채팅방 목록 가져오기](#모든-채팅방-목록-가져오기)
+    - [채팅방 내의 메세지 리스트 가져오기](#채팅방-내의-메세지-리스트-가져오기)
+    - [채팅방 내의 유저 리스트 가져오기](#채팅방에-접속해-있는-유저-리스트-가져오기)
+- `Client`
+    - [Initalize](#initalize)
+    - [Connect](#connect)
+    - [Subscribe](#subscribe)
+    - [Publish](#publish)
+    - [Disconnect](#disconnect)
+- [Versions](#versions)
+
 ## DB model
 ![db](https://user-images.githubusercontent.com/66898263/195061810-37357345-59a8-464f-992d-0a802f96c9cb.svg)
 
@@ -338,18 +346,85 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
 ```
 
 
-## Websocket client code
+## 채팅
+> Refer to `stompjs@6.1.2 API docs` [Link](https://stomp-js.github.io/api-docs/latest/index.html)
+### Initalize
+`client`를 지정한다.
+```javascript
+let client = Stomp.over(function () {
+    return new SockJs(API_URL + '/chat')
+});
+```
 
-`/src/main/resources/templates/chattest.html`
-[Link](https://github.com/ckdhkdwns/egg-talk/blob/api/eggtalk/src/main/resources/templates/chattest.html)
+### Connect
+토큰과 함께 서버에 연결한다.
+```javascript
+client.connect({ Authorization: token }, (data) => {
+    /*
+    client.publish({
+        destination: "/pub/message",
+        headers: { Authorization: token },
+        body: JSON.stringify({
+            messageType: 0,
+            roomId: roomId
+        })
+    });
+    */
+});
+```
+### Subscribe
+`roomId`에 해당하는 방에서 생성되는 메세지들을 모두 실시간으로 받아온다.
+```javascript
+client.subscribe('/sub/chat/room/' + roomId, (message) => {
+    const recv = JSON.parse(message.body);
+    setMessage(prev => [...prev, recv])
+});
+```
 
-#### GET Params
-`token`, `roomId`
+### Publish
+토큰과 함께 메세지를 보낸다.
+
+|Message Type|Value|Content Necessity |
+|:---:|:---:|:---:|
+|`0`| 입장 메세지| `False`|
+|`1`| 일반 메세지| `True`|
+|`2`| 퇴장 메세지| `False`|
+
+```javascript
+client.publish({
+    destination: "/pub/message",
+    headers: { Authorization: token },
+    body: JSON.stringify({
+        messageType: 0,
+        roomId: roomId
+        content: content
+    })
+});
+```
+
+
+### Disconnect
+`messageType: 2` 인 메세지를 보냄으로써 서버에 연결을 종료함을 알리고 연결을 끊는다.
+```javascript
+client.publish(
+    destination: "/pub/message", 
+    headers: { Authorization: data.token },
+    body: JSON.stringify({
+        messageType: 2,
+        roomId: data.roomId,    
+    })
+);
+client.disconnect();
+```
+
 
 
 ## Versions
+| Item | Version |
+|:---:|:---:|
+|`node.js`|`16.17.1`|
+|`jdk`|`17.0.4`|
+|`spring boot`|`2.7.4`|
+|`@stomp/stompjs`|`6.1.2`|
 
-- <b>node.js</b> 16.17.1
-- <b>jdk</b> 17.0.4 (openjdk)
-- <b>springboot</b> 2.7.4
 

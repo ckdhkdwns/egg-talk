@@ -16,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @AllArgsConstructor
 public class Message {
 
-    @JsonIgnore
     @Id
     @Column(name = "message_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
