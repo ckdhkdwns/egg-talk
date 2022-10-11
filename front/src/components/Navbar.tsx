@@ -89,7 +89,7 @@ function Navbar() {
           </LogoTitle>
         </LogoContainer>
       </Link>
-      {user && <div>Welcome, {`${user.username}`}</div>}
+      {user && <div>{`${user.displayname}`}님 환영합니다.</div>}
       <RightItems>
         {isLogin && (
           <>

@@ -75,7 +75,7 @@ const ErrorMessageArea = styled.div`
 `;
 
 type FormData = {
-  username: string;
+  displayname: string;
   password: string;
   email: string;
 };
@@ -119,7 +119,7 @@ function UserInfo() {
     axios
       .put(
         API_URL + `/users/${userInfo?.username}`,
-        { ...data, username: userInfo?.username },
+        { ...data },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -140,7 +140,14 @@ function UserInfo() {
         <Header>프로필 수정하기</Header>
         <UpdateForm onSubmit={handleSubmit(onValid)}>
           <Label>이름</Label>
-          <Input placeholder={userInfo?.username || ""} readOnly />
+          <Input
+            {...register("displayname", {
+              required: "이름을 입력해주세요.",
+              minLength: { value: 8, message: "이름이 너무 짧습니다" },
+              maxLength: { value: 20, message: "이름이 너무 깁니다" },
+            })}
+            placeholder={userInfo?.displayname || ""}
+          />
           <Label>이메일</Label>
           <Input
             {...register("email", {
@@ -170,8 +177,8 @@ function UserInfo() {
           />
           <EditBtn>수정하기</EditBtn>
 
-          {errors.username ? (
-            <ErrorMessageArea>{errors.username.message}</ErrorMessageArea>
+          {errors.displayname ? (
+            <ErrorMessageArea>{errors.displayname.message}</ErrorMessageArea>
           ) : errors.email ? (
             <ErrorMessageArea>{errors.email.message}</ErrorMessageArea>
           ) : null}

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import { JoinFormType } from "../api";
 import { isLoginAtom } from "../atoms";
 import Logo from "../components/Logo";
 
@@ -82,24 +83,17 @@ const ErrorMessageArea = styled.div`
   color: ${(props) => props.theme.redTextColor};
 `;
 
-type FormData = {
-  username: string;
-  password: string;
-  email: string;
-  gender: string;
-};
-
 function Join() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<JoinFormType>();
   const [isValid, setIsValid] = useState(true);
   const navigate = useNavigate();
   const isLogin = useRecoilValue(isLoginAtom);
 
-  const onValid = async (data: FormData) => {
+  const onValid = async (data: JoinFormType) => {
     // console.log(data);
     axios
       .post("https://egg-talk-server.run.goorm.io/users", {
@@ -119,11 +113,7 @@ function Join() {
       });
   };
 
-  // console.log(watch()); // watch input value by passing the name of it
-
   useEffect(() => {
-    // if token exist
-    // if (localStorage.getItem("token") && localStorage.getItem("token") !== "")
     isLogin && navigate("/");
   });
 
@@ -133,7 +123,7 @@ function Join() {
         <Logo />
       </Link>
       <Form onSubmit={handleSubmit(onValid)}>
-        <Label>아이디</Label>
+        <Label>Username</Label>
         <Input
           {...register("username", {
             required: "아이디를 입력해주세요.",
@@ -146,7 +136,16 @@ function Join() {
           })}
           placeholder="아이디를 입력하세요."
         />
-        <Label>비밀번호</Label>
+        <Label>Display Name</Label>
+        <Input
+          {...register("displayname", {
+            required: "이름을 입력해주세요.",
+            minLength: { value: 5, message: "이름을 너무 짧습니다" },
+            maxLength: { value: 20, message: "이름을 너무 깁니다" },
+          })}
+          placeholder="아이디를 입력하세요."
+        />
+        <Label>Password</Label>
         <Input
           {...register("password", {
             required: "비밀번호를 입력해주세요.",
@@ -161,7 +160,7 @@ function Join() {
           type="password"
           placeholder="비밀번호를 입력하세요."
         />
-        <Label>이메일</Label>
+        <Label>Email</Label>
         <Input
           {...register("email", {
             required: "이메일를 입력해주세요.",
@@ -174,7 +173,7 @@ function Join() {
           })}
           placeholder="이메일을 입력하세요."
         />
-        <Label>성별</Label>
+        <Label>Gender</Label>
         <RadioContainer>
           <Radio
             {...register("gender", { required: "성별을 입력해주세요." })}
@@ -192,6 +191,8 @@ function Join() {
         <SignUpBtn>가입하기</SignUpBtn>
         {errors.username ? (
           <ErrorMessageArea>{errors.username.message}</ErrorMessageArea>
+        ) : errors.displayname ? (
+          <ErrorMessageArea>{errors.displayname.message}</ErrorMessageArea>
         ) : errors.password ? (
           <ErrorMessageArea>{errors.password.message}</ErrorMessageArea>
         ) : errors.email ? (

@@ -1,5 +1,13 @@
 export const API_URL = "https://egg-talk-server.run.goorm.io";
 
+export type JoinFormType = {
+  username: string;
+  displayname: string;
+  password: string;
+  email: string;
+  gender: string;
+};
+
 export type LoginFormData = {
   username: string;
   password: string;
@@ -8,6 +16,7 @@ export type LoginFormData = {
 export type userData = {
   authorityDtoSet: [];
   username: string;
+  displayname: string;
   email: string;
   gender: number;
 } | null;
@@ -25,7 +34,7 @@ export type TypeMessage = {
   id: number;
   messageType: number;
   roomId: number;
-  username: string;
+  displayname: string;
 };
 
 export const roomsTest = [

@@ -32,7 +32,7 @@ const GetRoom = styled.div`
 
 function Message(model: TypeMessage) {
   const userInfo = useRecoilValue(userInfoAtom); // test32
-  const isIncoming = !(model.username === userInfo?.username);
+  const isIncoming = !(model.displayname === userInfo?.displayname);
 
   return (
     <Wrapper incoming={isIncoming}>
@@ -40,7 +40,7 @@ function Message(model: TypeMessage) {
         <GetRoom>{model.content}</GetRoom>
       ) : (
         <>
-          {isIncoming && <Sender>{model.username}</Sender>}
+          {isIncoming && <Sender>{model.displayname}</Sender>}
           <MessageContainer incoming={isIncoming}>
             {model.content}
           </MessageContainer>
