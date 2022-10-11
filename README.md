@@ -347,7 +347,7 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
 
 
 ## 채팅
-> Refer to `stompjs@6.1.2 API docs` [Link](https://stomp-js.github.io/api-docs/latest/index.html)
+> Refer to `stompjs@6.1.2` API docs [Link](https://stomp-js.github.io/api-docs/latest/index.html)
 ### Initalize
 `client`를 지정한다.
 ```javascript
