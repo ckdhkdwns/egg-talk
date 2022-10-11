@@ -5,7 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { API_URL, userData } from "../api";
-import { isLoginAtom, newChatModalAtom, userInfoAtom } from "../atoms";
+import {
+  currentRoomIdAtom,
+  isLoginAtom,
+  messagesAtom,
+  newChatModalAtom,
+  userInfoAtom,
+} from "../atoms";
 import Chat from "../components/Chat";
 import Chatroom from "../components/Chatroom";
 import Loader from "../components/Loader";
@@ -16,7 +22,6 @@ const Wrapper = styled.div`
   justify-content: center;
   position: absolute;
   top: 0;
-  padding: 100px 10vw;
   width: 100vw;
   height: 100vh;
   padding: 100px 7vw;
@@ -37,6 +42,8 @@ function Main() {
   const setUser = useSetRecoilState<userData>(userInfoAtom);
   const isLogin = useRecoilValue(isLoginAtom);
   const newChatModalIsOpen = useRecoilValue(newChatModalAtom);
+  const setMessages = useSetRecoilState(messagesAtom);
+  const currentRoomId = useRecoilValue(currentRoomIdAtom);
 
   useEffect(() => {
     // if token doesn't exist or is empty string, let client login
@@ -46,6 +53,7 @@ function Main() {
     }
 
     const { token }: any = JSON.parse(localStorage.getItem("token")!);
+
     axios
       .get(API_URL + "/auth/me", {
         headers: {
@@ -59,6 +67,22 @@ function Main() {
         console.log("error at /user/me", error);
       });
   }, [isLogin, navigate, setUser]);
+
+  useEffect(() => {
+    const { token }: any = JSON.parse(localStorage.getItem("token")!);
+    currentRoomId &&
+      axios
+        .get("/rooms/" + currentRoomId + "/messages", {
+          headers: { Authorization: token },
+        })
+        .then((res) => {
+          console.log(res.data);
+          setMessages(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  }, [currentRoomId]);
 
   return isLogin ? (
     <Wrapper>

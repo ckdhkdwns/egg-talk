@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { API_URL } from "../api";
@@ -8,6 +8,7 @@ import { ReactComponent as SearchIcon } from "../images/search.svg";
 import { ReactComponent as AddIcon } from "../images/add.svg";
 import {
   currentRoomIdAtom,
+  isDarkAtom,
   isLoginAtom,
   newChatModalAtom,
   roomsAtom,
@@ -15,25 +16,27 @@ import {
 } from "../atoms";
 import Room from "./Room";
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ isDark: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   width: 30vw;
   min-width: 300px;
   height: 100%;
-  background-color: #f5f5f5;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+  background-color: ${(props) => (props.isDark ? "#2c2d30" : "#f5f5f5")};
+  border-top-left-radius: 0.125rem;
+  border-bottom-left-radius: 0.125rem;
 `;
-const Header = styled.div`
+const Header = styled.div<{ isDark: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   min-height: 50px;
-  background: #66757f;
+  background: ${(props) => (props.isDark ? "#666666" : "#66757f")};
   color: white;
   border-top-left-radius: inherit;
+  border-bottom: ${(props) =>
+    props.isDark ? "1px solid #4e4e4e" : "1px solid lightgray"};
 `;
 const HeaderTitle = styled.div`
   margin-left: 15px;
@@ -49,8 +52,8 @@ const HeaderItem = styled.div`
   justify-content: center;
   align-items: center;
   margin-right: 15px;
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border-radius: 20px;
   cursor: pointer;
   &:hover {
@@ -64,6 +67,7 @@ const RoomList = styled.ul`
 
 function Chatroom() {
   const navigate = useNavigate();
+  const isDark = useRecoilValue(isDarkAtom);
   const isLogin = useRecoilValue(isLoginAtom);
   const rooms = useRecoilValue(roomsAtom);
   const setRooms = useSetRecoilState(roomsAtom);
@@ -88,6 +92,7 @@ function Chatroom() {
           },
         })
         .then(function (response: AxiosResponse) {
+          console.log("/rooms =>", response.data);
           setRooms(response.data);
           setRoomId(response.data[0].roomId);
         })
@@ -97,8 +102,8 @@ function Chatroom() {
   }, [isLogin, navigate, setRoomId, userInfo]);
 
   return (
-    <Wrapper>
-      <Header>
+    <Wrapper isDark={isDark}>
+      <Header isDark={isDark}>
         <HeaderTitle>채팅</HeaderTitle>
         <HeaderItems>
           <HeaderItem>

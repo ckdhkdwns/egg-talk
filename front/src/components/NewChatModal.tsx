@@ -91,7 +91,9 @@ function NewChatModal({ isOpen }: IModal) {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: any, e: any) => {
+    e.preventDefault();
+    e.target[0].value = "";
     console.log(data);
   };
 

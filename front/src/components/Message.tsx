@@ -21,7 +21,8 @@ const MessageContainer = styled.div<{ incoming: Boolean }>`
   max-width: 60%;
   padding: 15px 10px;
   border-radius: 13px;
-  background: ${(props) => (props.incoming ? "#f7c7c7" : "#c1e4ec")};
+  background: ${(props) =>
+    props.incoming ? props.theme.incomingMessage : props.theme.outgoingMessage};
   word-break: break-all;
 `;
 const GetRoom = styled.div`
@@ -36,12 +37,12 @@ function Message(model: TypeMessage) {
   return (
     <Wrapper incoming={isIncoming}>
       {model.messageType === 0 || model.messageType === 2 ? (
-        <GetRoom>{model.message}</GetRoom>
+        <GetRoom>{model.content}</GetRoom>
       ) : (
         <>
           {isIncoming && <Sender>{model.username}</Sender>}
           <MessageContainer incoming={isIncoming}>
-            {model.message}
+            {model.content}
           </MessageContainer>
         </>
       )}

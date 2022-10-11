@@ -1,22 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import {
   currentRoomIdAtom,
+  isDarkAtom,
   messagesAtom,
   roomsAtom,
-  userInfoAtom,
 } from "../atoms";
 import Message from "./Message";
 import { ReactComponent as SearchIcon } from "../images/search.svg";
 import { ReactComponent as SendIcon } from "../images/send.svg";
-import { Stomp } from "@stomp/stompjs";
+import Stomp from "stompjs";
 import axios from "axios";
 import { API_URL, TypeMessage } from "../api";
 import { useForm } from "react-hook-form";
 import SockJS from "sockjs-client";
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ isDark: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -24,13 +24,13 @@ const Wrapper = styled.div`
   min-width: 180px;
   width: 100%;
   height: 100%;
-  background: #fff;
+  background: ${(props) => (props.isDark ? "#5c5c5c" : "#fff")};
   position: relative;
   border-top-right-radius: 0.125rem;
   border-bottom-right-radius: 0.125rem;
   border-left: 1px solid #0000003d;
 `;
-const Header = styled.div`
+const Header = styled.div<{ isDark: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,7 +38,7 @@ const Header = styled.div`
   min-height: 50px;
   height: 50px;
   position: relative;
-  background: #66757f;
+  background: ${(props) => (props.isDark ? "#666666" : "#66757f")};
   border-top-right-radius: inherit;
 `;
 const RoomName = styled.div`
@@ -49,7 +49,7 @@ const SearchBtnContainer = styled.div`
   position: absolute;
   right: 15px;
 `;
-const ChatContainer = styled.div`
+const ChatContainer = styled.div<{ isDark: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -57,7 +57,7 @@ const ChatContainer = styled.div`
   height: 100%;
   padding: 20px;
   overflow-y: auto;
-  background-color: #f5f5f5;
+  background: ${(props) => (props.isDark ? "#2c2d30" : "#f5f5f5")};
 `;
 const InputContainer = styled.div`
   display: flex;
@@ -75,7 +75,7 @@ const Input = styled.input`
   width: 100%;
   border-radius: 5px;
   outline: 0;
-  background: #dfdfdf;
+  background: #eaeaea;
   border: 0;
   padding: 5px 10px;
 `;
@@ -96,32 +96,34 @@ const SendBtn = styled.button`
 `;
 
 function Chat() {
+  const isDark = useRecoilValue(isDarkAtom);
   const messages = useRecoilValue(messagesAtom);
   const setMessages = useSetRecoilState(messagesAtom);
   const rooms = useRecoilValue(roomsAtom);
   const roomId = useRecoilValue(currentRoomIdAtom);
-  const userInfo = useRecoilValue(userInfoAtom);
+
   const {
     register,
     handleSubmit,
     // formState: { errors },
   } = useForm();
 
-  let ws = Stomp.over(new SockJS(API_URL + "/ws/chat"));
-  const token = localStorage["token"].token;
+  let sock = new SockJS(API_URL + "/chat");
+  let ws = Stomp.over(sock);
+  const token = JSON.parse(localStorage["token"]).token;
 
-  function connectServer() {
+  async function connectServer() {
     ws.connect(
-      { Authorization: token },
-      function (frame: any) {
-        console.log(frame);
-        ws.subscribe("/topic/chat/room/" + roomId, (message) => {
+      { Authorization: JSON.parse(localStorage["token"]).token },
+      () => {
+        ws.subscribe("/sub/chat/room/" + roomId, (message) => {
           var recv: TypeMessage = JSON.parse(message.body);
           console.log(recv);
-          setMessages([...messages, { ...recv }]);
+          console.log(messages);
+          setMessages([...messages, recv]);
         });
         ws.send(
-          "/app/chat/message",
+          "/pub/message",
           {
             Authorization: token,
           },
@@ -136,61 +138,55 @@ function Chat() {
       }
     );
   }
-  const enterRoom = async () => {
-    await connectServer();
-    await axios
-      .get("/rooms/" + roomId + "/messages", {
-        headers: { Authorization: token },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setMessages(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-  const onSend = (message: any, e: any) => {
-    e.preventDefault();
+
+  function onSend(messageData: any, e: any) {
     e.target[0].value = "";
-
-    userInfo &&
-      roomId &&
-      setMessages([
-        ...messages,
-        {
-          createdDate: new Date().toLocaleDateString(),
-          id: messages.length,
-          messageType: 1,
-          roomId: roomId,
-          userId: 0,
-          username: userInfo.username,
-          content: message.message,
-        },
-      ]);
-
     ws.send(
-      "/app/chat/message",
+      "/pub/message",
       {
         Authorization: token,
       },
       JSON.stringify({
         messageType: 1,
         roomId: roomId,
-        message: message.message,
+        content: messageData.message,
       })
     );
+  }
+
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
-    if (roomId !== 0) {
-      enterRoom();
+    console.log(`Entering room: ${roomId}`);
+    // const { token }: any = JSON.parse(localStorage.getItem("token")!);
+    if (roomId) {
+      // axios
+      //   .get(API_URL + "/rooms/" + roomId + "/messages", {
+      //     headers: { Authorization: token },
+      //   })
+      //   .then((res) => {
+      //     setMessages(res.data);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+      connectServer();
     }
   }, [roomId]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
-    <Wrapper>
-      <Header>
+    <Wrapper isDark={isDark}>
+      <Header isDark={isDark}>
         {roomId && (
           <RoomName>
             {rooms.filter((room) => room?.roomId === roomId)[0]?.roomName}
@@ -200,7 +196,7 @@ function Chat() {
           <SearchIcon fill="#fff" />
         </SearchBtnContainer>
       </Header>
-      <ChatContainer>
+      <ChatContainer ref={chatBoxRef} isDark={isDark}>
         <div style={{ width: "100%", height: "100%" }}>
           {messages.map((message, i) => {
             return <Message key={i} {...message} />;
@@ -210,7 +206,10 @@ function Chat() {
       <Form onSubmit={handleSubmit(onSend)}>
         <InputContainer>
           <Input
-            {...register("message", { required: "This is Required" })}
+            {...register("message", {
+              required: "This is Required",
+              minLength: 1,
+            })}
             placeholder="메세지를 입력하세요."
           />
           <SendBtn type="submit">
