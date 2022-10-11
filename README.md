@@ -116,9 +116,10 @@
 
 ```json
 {
-    "username": "dbswnduf",
+    "username": "zhdqks",
+    "displayname": "차왕준",
     "gender": true,
-    "email": "test2@test.com"
+    "email": "test2@test.com",
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
