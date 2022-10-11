@@ -8,10 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import eggtalk.eggtalk.dto.RoomDto;
-import eggtalk.eggtalk.entity.Message;
-import eggtalk.eggtalk.entity.Room;
-import eggtalk.eggtalk.entity.User;
+import eggtalk.eggtalk.dto.chat.RoomDto;
+import eggtalk.eggtalk.entity.chat.Room;
+import eggtalk.eggtalk.entity.chat.Message;
+import eggtalk.eggtalk.entity.user.User;
 import eggtalk.eggtalk.exception.NotFoundMemberException;
 import eggtalk.eggtalk.service.ChatService;
 import eggtalk.eggtalk.service.UserService;

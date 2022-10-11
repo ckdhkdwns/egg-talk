@@ -1,6 +1,9 @@
-package eggtalk.eggtalk.entity;
+package eggtalk.eggtalk.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import eggtalk.eggtalk.entity.BaseTime;
+import eggtalk.eggtalk.entity.auth.Authority;
 import lombok.*;
 import javax.persistence.*;
 import java.util.Set;

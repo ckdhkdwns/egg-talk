@@ -1,10 +1,11 @@
-package eggtalk.eggtalk.dto;
+package eggtalk.eggtalk.dto.user;
 
 
 
-import eggtalk.eggtalk.entity.UserRoom;
 import lombok.*;
 import javax.validation.constraints.NotNull;
+
+import eggtalk.eggtalk.entity.user.UserRoom;
 
 
 @Getter

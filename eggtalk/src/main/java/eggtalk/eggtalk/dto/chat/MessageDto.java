@@ -1,12 +1,13 @@
-package eggtalk.eggtalk.dto;
+package eggtalk.eggtalk.dto.chat;
 
-import eggtalk.eggtalk.entity.Message;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import eggtalk.eggtalk.entity.chat.Message;
 
 @Getter
 @Setter

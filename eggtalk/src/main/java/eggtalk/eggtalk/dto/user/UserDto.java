@@ -1,8 +1,9 @@
-package eggtalk.eggtalk.dto;
+package eggtalk.eggtalk.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import eggtalk.eggtalk.entity.User;
+import eggtalk.eggtalk.dto.auth.AuthorityDto;
+import eggtalk.eggtalk.entity.user.User;
 import lombok.*;
 
 import java.util.Set;

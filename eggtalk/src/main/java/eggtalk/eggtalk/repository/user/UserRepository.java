@@ -1,11 +1,11 @@
-package eggtalk.eggtalk.repository;
+package eggtalk.eggtalk.repository.user;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import eggtalk.eggtalk.entity.User;
+import eggtalk.eggtalk.entity.user.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
     @EntityGraph(attributePaths = "authorities")

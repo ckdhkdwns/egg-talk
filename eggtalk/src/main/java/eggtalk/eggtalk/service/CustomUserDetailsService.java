@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import eggtalk.eggtalk.entity.User;
-import eggtalk.eggtalk.repository.UserRepository;
+import eggtalk.eggtalk.entity.user.User;
+import eggtalk.eggtalk.repository.user.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

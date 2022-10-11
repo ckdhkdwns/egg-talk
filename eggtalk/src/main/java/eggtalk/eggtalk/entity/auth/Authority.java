@@ -1,4 +1,4 @@
-package eggtalk.eggtalk.entity;
+package eggtalk.eggtalk.entity.auth;
 
 import lombok.*;
 

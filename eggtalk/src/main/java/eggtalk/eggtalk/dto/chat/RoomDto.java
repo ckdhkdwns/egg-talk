@@ -1,9 +1,10 @@
-package eggtalk.eggtalk.dto;
-import eggtalk.eggtalk.entity.Room;
+package eggtalk.eggtalk.dto.chat;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import eggtalk.eggtalk.entity.chat.Room;
 
 @Getter
 @Setter

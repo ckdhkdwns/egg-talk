@@ -1,4 +1,4 @@
-package eggtalk.eggtalk.entity;
+package eggtalk.eggtalk.entity.user;
 
 import lombok.*;
 
@@ -15,7 +15,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @IdClass(UserRoom.class)
 public class UserRoom implements Serializable {    
-
     @Id
     @Column(name = "user_id") 
     private Integer userId;

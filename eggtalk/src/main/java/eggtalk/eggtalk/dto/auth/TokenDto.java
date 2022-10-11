@@ -1,4 +1,4 @@
-package eggtalk.eggtalk.dto;
+package eggtalk.eggtalk.dto.auth;
 
 import lombok.*;
 

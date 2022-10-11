@@ -1,11 +1,11 @@
-package eggtalk.eggtalk.repository;
+package eggtalk.eggtalk.repository.user;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import eggtalk.eggtalk.entity.UserRoom;
+import eggtalk.eggtalk.entity.user.UserRoom;
 
 public interface UserRoomRepository extends JpaRepository<UserRoom, Integer> {
     List<UserRoom> findAllByUserId(Integer userId);

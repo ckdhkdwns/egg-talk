@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import eggtalk.eggtalk.dto.LoginDto;
-import eggtalk.eggtalk.dto.TokenDto;
-import eggtalk.eggtalk.dto.UserDto;
-
-
+import eggtalk.eggtalk.dto.auth.LoginDto;
+import eggtalk.eggtalk.dto.auth.TokenDto;
+import eggtalk.eggtalk.dto.user.UserDto;
 import eggtalk.eggtalk.jwt.JwtFilter;
 import eggtalk.eggtalk.jwt.TokenProvider;
 

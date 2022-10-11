@@ -29,7 +29,8 @@
 - [Versions](#versions)
 
 ## DB model
-![db](https://user-images.githubusercontent.com/66898263/195061810-37357345-59a8-464f-992d-0a802f96c9cb.svg)
+친구관계를 위한 테이블들과 채팅기능을 위한 테이블들로 나뉜다.
+![db](https://user-images.githubusercontent.com/66898263/195126217-01054cb9-0cb9-40e1-b0ac-f718107ad9d0.svg)
 
 
 ## Usage

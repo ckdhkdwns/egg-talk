@@ -1,8 +1,10 @@
-package eggtalk.eggtalk.entity;
+package eggtalk.eggtalk.entity.chat;
 
 import lombok.*;
 
 import javax.persistence.*;
+
+import eggtalk.eggtalk.entity.BaseTime;
 
 @Entity
 @Table(name = "room")

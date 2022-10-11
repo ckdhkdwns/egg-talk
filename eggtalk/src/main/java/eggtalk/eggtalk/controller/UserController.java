@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import eggtalk.eggtalk.dto.UserDto;
-import eggtalk.eggtalk.entity.Room;
+import eggtalk.eggtalk.dto.user.UserDto;
+import eggtalk.eggtalk.entity.chat.Room;
 import eggtalk.eggtalk.exception.DuplicateMemberException;
 import eggtalk.eggtalk.exception.InvalidPasswordException;
 import eggtalk.eggtalk.exception.InvalidUserException;
@@ -32,7 +32,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getMyUserWithAuthorities());
     }
 
-    /** 유저 정보 등록하기 (Insert) */
+    /** 유저 정보 등록하기 */
     @PostMapping("")
     public ResponseEntity<UserDto> insertUser(
             @Valid @RequestBody UserDto userDto) {
@@ -60,15 +60,6 @@ public class UserController {
     public List<Room> getUserRooms(@PathVariable String username) {
         return chatService.findRoomByUsername(username);
     }
-
-    /*
-     * @GetMapping("/user/{userId}")
-     * 
-     * @PreAuthorize("hasAnyRole('ADMIN')")
-     * public ResponseEntity<UserDto> getUserInfo(@PathVariable String userId) {
-     * return ResponseEntity.ok(userService.getUserWithAuthorities(userId));
-     * }
-     */
 
     // 아이디 중복 예외처리 - 409
     @ExceptionHandler(DuplicateMemberException.class)

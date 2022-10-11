@@ -5,18 +5,18 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import eggtalk.eggtalk.dto.MessageDto;
-import eggtalk.eggtalk.dto.RoomDto;
-import eggtalk.eggtalk.dto.UserRoomDto;
-import eggtalk.eggtalk.entity.Message;
-import eggtalk.eggtalk.entity.Room;
-import eggtalk.eggtalk.entity.User;
-import eggtalk.eggtalk.entity.UserRoom;
+import eggtalk.eggtalk.dto.chat.MessageDto;
+import eggtalk.eggtalk.dto.chat.RoomDto;
+import eggtalk.eggtalk.dto.user.UserRoomDto;
+import eggtalk.eggtalk.entity.chat.Room;
+import eggtalk.eggtalk.entity.chat.Message;
+import eggtalk.eggtalk.entity.user.User;
+import eggtalk.eggtalk.entity.user.UserRoom;
 import eggtalk.eggtalk.exception.InvalidUserException;
-import eggtalk.eggtalk.repository.MessageRepository;
-import eggtalk.eggtalk.repository.RoomRepository;
-import eggtalk.eggtalk.repository.UserRepository;
-import eggtalk.eggtalk.repository.UserRoomRepository;
+import eggtalk.eggtalk.repository.chat.MessageRepository;
+import eggtalk.eggtalk.repository.chat.RoomRepository;
+import eggtalk.eggtalk.repository.user.UserRepository;
+import eggtalk.eggtalk.repository.user.UserRoomRepository;
 import eggtalk.eggtalk.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 

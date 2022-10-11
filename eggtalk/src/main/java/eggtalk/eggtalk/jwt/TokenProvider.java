@@ -14,7 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import eggtalk.eggtalk.repository.UserRepository;
+import eggtalk.eggtalk.repository.user.UserRepository;
 
 import java.security.Key;
 import java.util.Arrays;

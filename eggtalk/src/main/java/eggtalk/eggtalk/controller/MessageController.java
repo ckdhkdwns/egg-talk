@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.messaging.handler.annotation.Header;
 
-import eggtalk.eggtalk.entity.Message;
+import eggtalk.eggtalk.entity.chat.Message;
 import eggtalk.eggtalk.jwt.TokenProvider;
 import eggtalk.eggtalk.service.ChatService;
 import eggtalk.eggtalk.service.UserService;
