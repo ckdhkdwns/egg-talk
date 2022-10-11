@@ -20,7 +20,7 @@ public class MessageDto {
 
    @NotNull
    @Size(min=5, max=50)
-   private String username;
+   private String displayname;
 
    @NotNull
    private Integer roomId;
@@ -41,7 +41,7 @@ public class MessageDto {
 
       return MessageDto.builder()
          .userId(message.getUserId())
-         .username(message.getUsername())
+         .displayname(message.getDisplayname())
          .roomId(message.getRoomId())
          .content(message.getContent())
          .messageType(message.getMessageType())

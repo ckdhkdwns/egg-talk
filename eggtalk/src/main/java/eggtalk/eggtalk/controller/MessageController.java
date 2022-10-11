@@ -24,33 +24,32 @@ public class MessageController {
     private final UserService userService;
 
 
-    @MessageMapping("/chat/message")
+    @MessageMapping("/message")
     public void enter(Message message, @Header(name = "Authorization") String token) {
         Integer userId= tokenProvider.getUserId(token);
-        String username = userService.getUserInfoByUserId(userId).getUsername();
+        String displayname = userService.getUserInfoByUserId(userId).getDisplayname();
 
         LocalDateTime now = LocalDateTime.now();
         message.setCreatedDate(now);
         message.setUserId(userId);
-        message.setUsername(username);
+        message.setDisplayname(displayname);
 
         switch(message.getMessageType()) {
             case 0: 
-                if(chatService.findUserRoomById(userId, message.getRoomId()).isEmpty()) {                chatService.enterRoom(username, message.getRoomId());
-                    message.setContent(username+"님이 입장하였습니다.");
-                } else {
-                    return;
-                }
+                if(chatService.findUserRoomById(userId, message.getRoomId()).isEmpty()) {
+                    chatService.enterRoom(userId, message.getRoomId());
+                    message.setContent(displayname + "님이 입장하였습니다.");
+                } else { return; }
                 break;
             case 1:
                 break;
             case 2:
-                chatService.leaveRoom(username, message.getRoomId());
-                message.setContent(username+"님이 나갔습니다.");
+                chatService.leaveRoom(userId, message.getRoomId());
+                message.setContent(displayname+"님이 나갔습니다.");
                 break;
         }
             
-        sendingOperations.convertAndSend("/topic/chat/room/"+message.getRoomId(),message);
+        sendingOperations.convertAndSend("/sub/chat/room/"+message.getRoomId(),message);
         chatService.createMessage(message);
     }
 }

@@ -15,6 +15,7 @@
 <body>
     <input class="input-message" />
     <button class="send-btn" onclick="sendMessage()">Send</button>
+
     <div class="messages"></div>
 </body>
 
@@ -28,7 +29,7 @@
     function query(q) {
         return document.querySelector(q);
     }
-    let sock = new SockJS("/ws/chat");
+    let sock = new SockJS("https://egg-talk-server.run.goorm.io/chat");
     let ws = Stomp.over(sock);
     let reconnect = 0;
 
@@ -43,16 +44,16 @@
 
         ws.connect({ Authorization: data.token }, function (frame) {
             console.log(frame);
-            ws.subscribe("/topic/chat/room/" + data.roomId, function (message) {
+            ws.subscribe("/sub/chat/room/" + data.roomId, function (message) {
                 var recv = JSON.parse(message.body);
                 data.messages.push({
-                    name: recv.username,
+                    name: recv.displayname,
                     content: recv.content,
                     createdDate: recv.createdDate
                 });
-                appendMessageToBoard(recv.username, recv.content, recv.createdDate);
+                appendMessageToBoard(recv.displayname, recv.content, recv.createdDate);
             });
-            ws.send("/app/chat/message", {
+            ws.send("/pub/message", {
                 Authorization: data.token
             },
                 JSON.stringify({
@@ -63,7 +64,7 @@
             if (reconnect++ <= 5) {
                 setTimeout(function () {
                     console.log("connection reconnect");
-                    sock = new SockJS("/ws/chat");
+                    sock = new SockJS("/chat");
                     ws = Stomp.over(sock);
                     connect();
                 }, 1000);
@@ -72,7 +73,7 @@
     }
     
     function disconnectServer() {
-        ws.send("/app/chat/message", {
+        ws.send("/pub/message", {
             Authorization: data.token
         },
             JSON.stringify({
@@ -83,7 +84,7 @@
     }
     
     function sendMessage() {
-        ws.send("/app/chat/message", {
+        ws.send("/pub/message", {
             Authorization: data.token
         },
             JSON.stringify({
@@ -102,12 +103,12 @@
                         content: "",
                         date: ""
                     }
-                    message.name = m.username;
+                    message.name = m.displayname;
                     message.content = m.content;
                     message.date = m.createdDate;
                     data.messages.push(message);
 
-                    appendMessageToBoard(m.username, m.content, m.createdDate);
+                    appendMessageToBoard(m.displayname, m.content, m.createdDate);
                 }
             });
         

@@ -23,6 +23,9 @@ public class User extends BaseTime{
    @Column(name = "username", length = 50, unique = true)
    private String username;
 
+   @Column(name = "displayname", length = 50)
+   private String displayname;
+
    @JsonIgnore
    @Column(name = "password", length = 100)
    private String password;

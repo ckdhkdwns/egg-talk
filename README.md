@@ -21,7 +21,7 @@
         - [채팅방 내의 메세지 리스트 가져오기](#채팅방-내의-메세지-리스트-가져오기)
         - [채팅방 내의 유저 리스트 가져오기](#채팅방에-접속해-있는-유저-리스트-가져오기)
 ## DB model
-![db](https://user-images.githubusercontent.com/66898263/194763686-a649e3a2-7fb0-4735-b77c-bdae5ec988eb.svg)
+![db](https://user-images.githubusercontent.com/66898263/195061810-37357345-59a8-464f-992d-0a802f96c9cb.svg)
 
 
 ## Usage
@@ -32,6 +32,7 @@
 |:---:|:---:|:---:|:---:|
 | `username` | `String` | `3 ` |  `50 ` |
 | `password` | `String` | `8 ` |  `100 ` |
+| `displayname` | `String` | `3` | `50` |
 | `gender` | `Boolean` | `1 ` |  `1 ` |
 | `email` | `String` | `5 ` |  `50 ` |
 | `roomId` | `Integer` | `1 ` |  `11 ` |
@@ -81,9 +82,10 @@
 #### Response
 ```json
 {
-    "username": "ckdhkdwns",
+    "username": "zhdqks",
+    "displayname": "차왕준",
     "gender": true,
-    "email": "test@test.com",
+    "email": "test2@test.com",
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
@@ -103,10 +105,11 @@
 #### Request
 ```json
 {
-    "username": "dbswnduf",
+    "username": "zhdqks",
+    "displayname": "차왕준",
     "password": "1q2w3e4r",
-    "gender": false,
-    "email": "wnduf@email.com"
+    "email": "test2@test.com",
+    "gender": true
 }
 ```
 #### Response
@@ -114,8 +117,8 @@
 ```json
 {
     "username": "dbswnduf",
-    "gender": false,
-    "email": "wnduf@email.com"
+    "gender": true,
+    "email": "test2@test.com"
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
@@ -136,14 +139,15 @@
 
 #### Example URL
 
-`.../users/ckdhkdwns`
+`.../users/zhdqks`
 
 #### Response
 ```json
 {
-    "username": "ckdhkdwns",
-    "gender": false,
-    "email": "zhdqks@naver.com",
+    "username": "zhdqks",
+    "displayname": "차왕준",
+    "gender": true,
+    "email": "test2@test.com",
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
@@ -166,17 +170,19 @@
 #### Requset
 ```json
 {
+    "displayname": "차킹준",
     "password": "1q2w3e4r",
-    "email": "zhdqks@naver.com"
+    "email": "zhdqks1@naver.com"
 }
 ```
 
 #### Response
 ```json
 {
-    "username": "ckdhkdwns",
-    "gender": false,
-    "email": "zhdqks@naver.com",
+    "username": "zhdqks",
+    "displayname": "차킹준",
+    "gender": true,
+    "email": "zhdqks1@naver.com",
     "authorityDtoSet": [
         {
             "authorityName": "ROLE_USER"
@@ -291,13 +297,11 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
 ```json
 [
     {
-        "id": 1,
-        "userId": 2,
-        "username": "ckdhkdwns",
-        "roomId": 3,
+        "displayname": "차왕준",
+        "roomId": 6,
         "messageType": 0,
-        "content": "ckdhkdwns님이 입장하였습니다.",
-        "createdDate": "2022-10-09T14:31:42"
+        "content": "차왕준님이 입장하였습니다.",
+        "createdDate": "2022-10-11T09:49:30"
     },
 ]
 ```
@@ -316,17 +320,19 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
 ```json
 [
     {
-        "createdDate": "2022-10-09T14:15:20",
-        "username": "ckdhkdwns",
-        "gender": false,
-        "email": "zhdqks@naver.com"
+        "createdDate": "2022-10-11T09:31:48",
+        "username": "zhdqks",
+        "displayname": "차킹준",
+        "gender": true,
+        "email": "zhdqks1@naver.com"
     },
     {
         "createdDate": "2022-10-09T14:47:36",
         "username": "juyeolyoon",
+        "displayname": "주열",
         "gender": false,
         "email": "different"
-    }
+    },
 ]
 ```
 

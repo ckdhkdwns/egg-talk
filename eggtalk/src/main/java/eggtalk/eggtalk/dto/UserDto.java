@@ -28,6 +28,10 @@ public class UserDto {
    private String username;
 
    @NotNull
+   @Size(min = 3, max = 50)
+   private String displayname;
+
+   @NotNull
    private Boolean gender;
 
    @NotNull
@@ -41,6 +45,7 @@ public class UserDto {
 
       return UserDto.builder()
               .username(user.getUsername())
+              .displayname(user.getDisplayname())
               .gender(user.getGender())
               .email(user.getEmail())
               .authorityDtoSet(user.getAuthorities().stream()

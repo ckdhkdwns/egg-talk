@@ -38,6 +38,7 @@ public class UserService {
         return UserDto.from(userRepository.findByUsername(username));
     }
 
+    /** 가입하기 */
     @Transactional
     public UserDto signup(UserDto userDto) {
         if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
@@ -54,6 +55,7 @@ public class UserService {
         User user = User.builder()
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .username(userDto.getUsername())
+                .displayname(userDto.getDisplayname())
                 .gender(userDto.getGender())
                 .authorities(Collections.singleton(authority))
                 .email(userDto.getEmail())
@@ -80,9 +82,10 @@ public class UserService {
     public UserDto updateUserInfo(String username, UserDto updateUserDto) {
         if (SecurityUtil.getCurrentUsername().get().equals(username)) {
             User user = userRepository.findByUsername(username);
+            user.setDisplayname(updateUserDto.getDisplayname());
             user.setPassword(passwordEncoder.encode(updateUserDto.getPassword()));
             user.setEmail(updateUserDto.getEmail());
-
+            
             return UserDto.from(userRepository.save(user));
         } else {
             throw new InvalidUserException("유저가 일치하지 않습니다.");

@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "message")
 @Getter
@@ -14,16 +16,18 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Message {
 
+    @JsonIgnore
     @Id
     @Column(name = "message_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer messageId;
 
+    @JsonIgnore
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "username", length = 50)
-    private String username;
+    @Column(name = "displayname", length = 50)
+    private String displayname;
 
     @Column(name = "room_id")
     private Integer roomId;

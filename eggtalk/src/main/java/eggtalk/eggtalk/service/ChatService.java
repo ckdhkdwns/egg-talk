@@ -31,15 +31,14 @@ public class ChatService {
     
     /** 모든 채팅방 찾기 */
     public List<Room> findAllRoom() {
-        // 채팅방 최근 생성 순으로 반환
         List<Room> rooms = roomRepository.findAll();
-        Collections.reverse(rooms);
+        Collections.reverse(rooms); // 채팅방 최근 생성 순으로 반환
 
         return rooms;
     }
 
     /** 채팅방 하나 찾기 */
-    public RoomDto findById(Integer roomId) {
+    public RoomDto findOneByRoomId(Integer roomId) {
         return RoomDto.from(roomRepository.findById(roomId).get());
     }
 
@@ -55,8 +54,6 @@ public class ChatService {
                 .roomId(roomId)
                 .build();
 
-                
-        System.out.println(userRoom.getClass());
         userRoomRepository.save(userRoom);
 
         return room;
@@ -77,15 +74,10 @@ public class ChatService {
         if (SecurityUtil.getCurrentUsername().get().equals(username)) {
             List<UserRoom> userRooms = userRoomRepository.findAllByUserId(userRepository.findByUsername(username).getUserId());
 
-            List<Room> chatRooms = new ArrayList<>();
-            for (int i = 0; i < userRooms.size(); i++) {
-                Optional<Room> room = roomRepository.findById(userRooms.get(i).getRoomId());
-                if(room.isPresent()) {
-                    chatRooms.add(room.get());
-                } else {
-                    //Pass
-                }
-            }
+            List<Room> chatRooms =  userRooms.stream()
+            .map(userRoom -> roomRepository.findById(userRoom.getRoomId()).orElse(null))
+            .collect(Collectors.toList());
+
             return chatRooms;
         } else {
             throw new InvalidUserException("유저가 일치하지 않습니다.");
@@ -94,11 +86,11 @@ public class ChatService {
     }
 
     /** 방 입장하기 */
-    public UserRoomDto enterRoom(String username, Integer roomId) {
-        User user = userRepository.findByUsername(username);
+    public UserRoomDto enterRoom(Integer userId, Integer roomId) {
+        User user = userRepository.findByUserId(userId);
         List<UserRoom> userRooms = userRoomRepository.findAllByUserId(user.getUserId());
-        for(int i=0;i<userRooms.size();i++) {
-            if(userRooms.get(i).getRoomId().equals(roomId)){
+        for(UserRoom userRoom : userRooms) {
+            if(userRoom.getRoomId().equals(roomId)){
                 return null;
             }
         }
@@ -110,8 +102,7 @@ public class ChatService {
     }
 
     /** 방 나가기 */
-    public void leaveRoom(String username, Integer roomId) {
-        Integer userId = userRepository.findByUsername(username).getUserId();
+    public void leaveRoom(Integer userId, Integer roomId) {
         List<UserRoom> userRooms = userRoomRepository.findAllByUserId(userId);
         for (UserRoom userRoom : userRooms) {
             if (userRoom.getRoomId().equals(roomId)) {

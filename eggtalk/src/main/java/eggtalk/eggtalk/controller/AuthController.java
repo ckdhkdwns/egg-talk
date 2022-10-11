@@ -40,13 +40,6 @@ public class AuthController {
 
     @PostMapping("")
     public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
-        // UserDto user = userService.getUserInfoByUsername(loginDto.getUsername());
-        // if(user.equals(null)) {
-        //     throw new NotFoundMemberException("존재하지 않는 유저입니다.");
-        // }
-        // if (!passwordEncoder.matches(passwordEncoder.encode(loginDto.getPassword()), user.getPassword())) {
-        //     throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
-        // }
         
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
