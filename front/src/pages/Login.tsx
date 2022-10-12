@@ -79,11 +79,6 @@ const LoginBtn = styled.button`
   :hover {
     background-color: #525e66;
   }
-  a {
-    font-family: "Noto Sans KR", sans-serif;
-    font-size: 15px;
-    font-weight: 300;
-  }
 `;
 const Label = styled.label`
   color: ${(props) => props.theme.subTextColor};

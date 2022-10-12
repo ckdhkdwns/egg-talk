@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { TailSpin } from "react-loader-spinner";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
@@ -57,13 +58,15 @@ const Label = styled.label`
   font-family: "Noto Sans KR", sans-serif;
 `;
 const SignUpBtn = styled.button`
-  border: 0;
-  outline: 0;
-  width: 100%;
+  display: flex;
+  justify-content: center;
   text-align: center;
+  width: 100%;
   margin: 10px 0;
   padding: 7px 0;
   background: #66757f;
+  outline: 0;
+  border: 0;
   border-radius: 3px;
   font-family: "Noto Sans KR", sans-serif;
   font-size: 15px;
@@ -92,19 +95,23 @@ function Join() {
   const [isValid, setIsValid] = useState(true);
   const navigate = useNavigate();
   const isLogin = useRecoilValue(isLoginAtom);
+  const [isFetching, setIsFetching] = useState(false);
 
   const onValid = async (data: JoinFormType) => {
     // console.log(data);
+    setIsFetching(true);
     axios
       .post("https://egg-talk-server.run.goorm.io/users", {
         ...data,
         gender: data.gender === "male" ? 0 : 1,
       })
       .then(function (response) {
+        setIsFetching(false);
         console.log(response);
-        navigate("/login");
+        navigate("/");
       })
       .catch(function (error) {
+        setIsFetching(false);
         console.log(error);
         // Case 1. Unauthorized
         error.request.status === 409 && setIsValid(false);
@@ -188,7 +195,22 @@ function Join() {
           />
           <GenderLabel>여자</GenderLabel>
         </RadioContainer>
-        <SignUpBtn>가입하기</SignUpBtn>
+        <SignUpBtn>
+          {isFetching ? (
+            <TailSpin
+              height="20"
+              width="20"
+              color="#fff"
+              ariaLabel="tail-spin-loading"
+              radius="2"
+              wrapperStyle={{}}
+              wrapperClass=""
+              visible={true}
+            />
+          ) : (
+            "가입하기"
+          )}
+        </SignUpBtn>
         {errors.username ? (
           <ErrorMessageArea>{errors.username.message}</ErrorMessageArea>
         ) : errors.displayname ? (
