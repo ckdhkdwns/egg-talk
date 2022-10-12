@@ -2,6 +2,8 @@ package eggtalk.eggtalk.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,12 @@ import eggtalk.eggtalk.dto.user.UserFriendDto;
 import eggtalk.eggtalk.entity.FriendRequest;
 import eggtalk.eggtalk.entity.auth.Authority;
 import eggtalk.eggtalk.entity.user.User;
+import eggtalk.eggtalk.entity.user.UserFriend;
 import eggtalk.eggtalk.exception.DuplicateMemberException;
 import eggtalk.eggtalk.exception.InvalidPasswordException;
 import eggtalk.eggtalk.exception.InvalidUserException;
 import eggtalk.eggtalk.exception.NotFoundMemberException;
+import eggtalk.eggtalk.exception.NotFoundRequestException;
 import eggtalk.eggtalk.repository.user.FriendRequestRepository;
 import eggtalk.eggtalk.repository.user.UserFriendRepository;
 import eggtalk.eggtalk.repository.user.UserRepository;
@@ -105,37 +109,88 @@ public class UserService {
 
     /** 친구 요청 */
     @Transactional
-    public FriendRequestDto requestFriend(Integer targetUserId) {
+    public FriendRequestDto requestFriend(FriendRequestDto friendRequestDto) {
         Integer currentUserId = getCurrentUserId();
-        
-        return FriendRequestDto.from(friendRequestRepository.save(
+        Integer targetUserId = userRepository.findByUsername(friendRequestDto.getTargetUsername()).getUserId();
+        friendRequestRepository.save(
             FriendRequest.builder()
                 .userId(targetUserId)
                 .requestedUserId(currentUserId)
                 .build()
-            ));
+        );
+        return FriendRequestDto.builder()
+            .targetUsername(friendRequestDto.getTargetUsername())
+            .requestedUsername(userRepository.findByUserId(currentUserId).getUsername())
+            .build();
     }
 
     /** 받은 친구 요청들 가져오기 */
     @Transactional
-    public List<FriendRequest> getFriendRequests() {
+    public List<FriendRequestDto> getFriendRequests() {
         Integer currentUserId = getCurrentUserId();
-        return friendRequestRepository.findAllByUserId(currentUserId);
+        return friendRequestRepository.findAllByUserId(currentUserId)
+            .orElseThrow(() -> new NotFoundRequestException("친구 요청을 찾을 수 없습니다.")).stream()
+            .map(friendRequest -> FriendRequestDto.builder()
+                .targetUsername(SecurityUtil.getCurrentUsername().orElseThrow(() -> new NotFoundMemberException("유저를 찾을 수 없습니다.")))
+                .requestedUsername(userRepository.findByUserId(friendRequest.getRequestedUserId()).getUsername())
+                .build())
+            .collect(Collectors.toList()); 
     }
 
 
     /** 친구 요청 수락하기 */
     @Transactional
-    public UserFriendDto acceptRequest(Integer requestedUserId) {
-        friendRequestRepository.findById(requestedUserId);
-        friendRequestRepository.delete(null);
-        return null;
+    public UserFriendDto acceptRequest(FriendRequestDto friendRequestDto) {
+        String requestedUsername = friendRequestDto.getRequestedUsername();
+        Integer currentUserId = getCurrentUserId();
+        List<FriendRequest> friendRequests = friendRequestRepository
+            .findAllByUserId(currentUserId)
+            .orElseThrow(() -> new NotFoundRequestException("친구 요청을 찾을 수 없습니다. - 1"));
+
+        Optional<FriendRequest> friendRequest = Optional.ofNullable(null);
+        for(FriendRequest f: friendRequests) {
+            if(f.getRequestedUserId().equals(userRepository.findByUsername(requestedUsername).getUserId())) {
+                friendRequest = Optional.of(f);
+            }
+        }
+
+        friendRequest.orElseThrow(()-> new NotFoundRequestException("친구 요청을 찾을 수 없습니다. - 2" ));
+        
+        friendRequestRepository.delete(friendRequest.get());
+
+        //친구 관계를 양방향으로 저장하기 위해 두 개의 관계를 저장함
+        userFriendRepository.save(
+            UserFriend.builder()
+                .userId(friendRequest.get().getRequestedUserId())
+                .friendId(friendRequest.get().getUserId())
+                .build()
+        );
+        userFriendRepository.save(
+            UserFriend.builder()
+                .userId(friendRequest.get().getUserId())
+                .friendId(friendRequest.get().getRequestedUserId())
+                .build()
+        );
+        return UserFriendDto.builder()
+            .username(SecurityUtil.getCurrentUsername()
+                .orElseThrow(() -> new NotFoundMemberException("유저를 찾을 수 없습니다.")))
+            .friendname(requestedUsername)
+            .build();
     }
 
     /** 친구 목록 가져오기 */
+    @Transactional
+    public List<UserFriendDto> getFriends() {
+        String currentUsername = SecurityUtil.getCurrentUsername().orElseThrow(() -> new NotFoundMemberException("유저를 찾을 수 없습니다."));
+        return userFriendRepository.findAllByUserId(getCurrentUserId()).stream()
+            .map(userFriend -> UserFriendDto.builder()
+                .username(currentUsername)
+                .friendname(userRepository.findByUserId(userFriend.getFriendId()).getUsername())
+                .build())
+            .collect(Collectors.toList()); 
+    }
 
-
-    /** 친구 끊기 */
+    
     private Integer getCurrentUserId() {
         return userRepository.findByUsername(SecurityUtil.getCurrentUsername()
             .orElseThrow(() -> new NotFoundMemberException("유저를 찾을 수 없습니다.")))

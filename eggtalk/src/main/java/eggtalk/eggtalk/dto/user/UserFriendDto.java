@@ -12,17 +12,9 @@ import eggtalk.eggtalk.entity.user.UserFriend;
 @NoArgsConstructor
 public class UserFriendDto {
    @NotNull
-   private Integer userId;
+   private String username;
 
    @NotNull
-   private Integer friendId;
+   private String friendname;
 
-   public static UserFriendDto from(UserFriend userFriend) {
-      if(userFriend == null) return null;
-
-      return UserFriendDto.builder()
-         .userId(userFriend.getUserId())
-         .friendId(userFriend.getFriendId())
-         .build();
-   }
 }

@@ -20,6 +20,11 @@
     - [모든 채팅방 목록 가져오기](#모든-채팅방-목록-가져오기)
     - [채팅방 내의 메세지 리스트 가져오기](#채팅방-내의-메세지-리스트-가져오기)
     - [채팅방 내의 유저 리스트 가져오기](#채팅방에-접속해-있는-유저-리스트-가져오기)
+- `.../friends`
+    - [친구 목록 확인하기](#친구-목록-확인하기)
+    - [친구 요청 목록 가져오기](#친구-요청-목록-가져오기)
+    - [친구 요청하기](#친구-요청하기)
+    - [친구 요청 수락하기](#친구-요청-수락하기)
 - `Client`
     - [Initalize](#initalize)
     - [Connect](#connect)
@@ -298,7 +303,7 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
 |:---:|:---:|:---:|
 | `GET` | `/rooms/{roomId}/messages` | `True` |
 
-- 방 아이디를 통해 채팅 메세지들을 불러온다.
+방 아이디를 통해 채팅 메세지들을 불러온다.
 
 #### Example URL
 `.../rooms/6/messages`
@@ -321,7 +326,8 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
 | Method | URL | Token Necessity |
 |:---:|:---:|:---:|
 | `GET` | `/rooms/{roomId}/users` | `True` |
-- 채팅방에 접속해 있는 유저의 정보들을 가져온다.
+
+채팅방에 접속해 있는 유저의 정보들을 가져온다.
 
 #### Example URL
 `.../rooms/3/users`
@@ -344,6 +350,98 @@ URL의 `username`과 토큰의 `username`이 일치하면 해당 아이디의 �
         "email": "different"
     },
 ]
+```
+
+<br/><br/>
+
+### 친구 목록 확인하기
+| Method | URL | Token Necessity |
+|:---:|:---:|:---:|
+| `GET` | `/friends` | `True` |
+
+현재 유저의 친구들 목록을 가져온다.
+
+#### Request
+```javascript
+//skip
+```
+
+#### Response
+```json
+[
+    {
+        "username": "zhdqks",
+        "friendname": "juyeolyoon"
+    },
+    {
+        "username": "zhdqks",
+        "friendname": "answodls"
+    }
+]
+```
+<br/><br/>
+
+### 친구 요청하기
+| Method | URL | Token Necessity |
+|:---:|:---:|:---:|
+| `POST` | `/friends/requests` | `True` |
+
+`targetUsername`에 친구요청을 보내고 싶은 유저 `username`을 넣는다.
+
+#### Request
+```json
+{
+    "targetUsername": "juyeolyoon"
+}
+```
+
+#### Response
+```json
+{
+    "targetUsername": "juyeolyoon",
+    "requestedUsername": "zhdqks"
+}
+```
+<br/><br/>
+
+### 친구 요청 목록 가져오기
+| Method | URL | Token Necessity |
+|:---:|:---:|:---:|
+| `GET` | `/friends/requests` | `True` |
+
+받은 친구요청 목록을 가져온다.
+
+#### Response
+```json
+[
+    {
+        "targetUsername": "juyeolyoon",
+        "requestedUsername": "zhdqks"
+    }
+]
+```
+<br/><br/>
+
+### 친구 요청 수락하기
+| Method | URL | Token Necessity |
+|:---:|:---:|:---:|
+| `POST` | `/friends` | `True` |
+
+친구 요청을 수락한다.
+
+### Request 
+```json
+{
+    "requestedUsername": "zhdqks"
+}
+```
+
+#### Response
+```json
+{
+    "username": "juyeolyoon",
+    "friendname": "zhdqks"
+}
 ```
 
 

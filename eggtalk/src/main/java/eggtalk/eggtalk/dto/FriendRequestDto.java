@@ -12,16 +12,8 @@ import eggtalk.eggtalk.entity.FriendRequest;
 @NoArgsConstructor
 public class FriendRequestDto {
     @NotNull
-   private Integer userId;
+   private String targetUsername;
 
    @NotNull
-   private Integer requestedUserId;
-   public static FriendRequestDto from(FriendRequest friendRequest) {
-    if(friendRequest == null) return null;
-
-    return FriendRequestDto.builder()
-       .userId(friendRequest.getUserId())
-       .requestedUserId(friendRequest.getRequestedUserId())
-       .build();
- }
+   private String requestedUsername;
 }

@@ -39,6 +39,8 @@ public class UserController {
         return ResponseEntity.ok(userService.signup(userDto));
     }
 
+    /** 모든 유저 정보 불러오기 */
+    
     /** 특정 유저 정보 불러오기 */
     @GetMapping("/{username}")
     public ResponseEntity<UserDto> getUser(
