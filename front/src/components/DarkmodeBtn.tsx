@@ -12,8 +12,9 @@ const Wrapper = styled.button<{ isDark: boolean }>`
   position: fixed;
   right: 7vw;
   bottom: 19px;
-  width: 136px;
+  min-width: 136px;
   height: 44px;
+  padding: 10px;
   background: ${(props) => (props.isDark ? "#343638" : "#ffffff")};
   color: ${(props) => (props.isDark ? "#d9d9d9" : "#202020")};
   background-position: -270px -55px;
@@ -60,9 +61,18 @@ function DarkmodeBtn() {
   };
   return (
     <Wrapper isDark={isDark} onClick={handleClick}>
-      {!isDark && <DarkIcon />}
-      {isDark && <LightIcon />}
-      <span>다크모드로 보기</span>
+      {!isDark && (
+        <>
+          <DarkIcon />
+          <span>다크모드로 보기</span>
+        </>
+      )}
+      {isDark && (
+        <>
+          <LightIcon />
+          <span>라이트모드로 보기</span>
+        </>
+      )}
     </Wrapper>
   );
 }
