@@ -1,8 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import { API_URL, TypeRoom } from "../api";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { currentRoomIdAtom, isDarkAtom, messagesAtom } from "../atoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  allChatAtom,
+  currentRoomIdAtom,
+  isChatLoadingAtom,
+  isDarkAtom,
+  messagesAtom,
+  myRoomsAtom,
+} from "../atoms";
 import axios, { AxiosResponse } from "axios";
 
 const Wrapper = styled.li<{ isDark: boolean; isSelected: boolean }>`
@@ -33,29 +40,36 @@ const RoomName = styled.div`
 `;
 
 function Room({ ...room }: TypeRoom) {
-  const setRoomId = useSetRecoilState(currentRoomIdAtom);
+  const [currentRoomId, setRoomId] = useRecoilState(currentRoomIdAtom);
   const setMessages = useSetRecoilState(messagesAtom);
   const isDark = useRecoilValue(isDarkAtom);
-  const currentRoomId = useRecoilValue(currentRoomIdAtom);
+  const [myrooms, setMyRooms] = useRecoilState(myRoomsAtom);
+  const setAllChat = useSetRecoilState(allChatAtom);
+  const setIsChatLoading = useSetRecoilState(isChatLoadingAtom);
 
   const onClick = () => {
     console.log("CURRENT ROOM:", room.roomId);
     setRoomId(room.roomId);
+    setAllChat(false);
+    setIsChatLoading(true);
 
-    // const { token }: any = JSON.parse(localStorage.getItem("token")!);
-    // axios
-    //   .get(API_URL + `/rooms/${room.roomId}/messages`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   })
-    //   .then(function (response: AxiosResponse) {
-    //     console.log(`/rooms/${room.roomId}/messages`, response);
-    //     setMessages(response.data);
-    //   })
-    //   .catch((error: any) => {
-    //     console.log("error:", error);
-    //   });
+    const { token }: any = JSON.parse(localStorage.getItem("token")!);
+    axios
+      .get(API_URL + `/rooms/${room.roomId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(function (response: AxiosResponse) {
+        // console.log(`/rooms/${room.roomId}/messages`, response.data);
+        setMessages(response.data);
+        myrooms.filter((myroom) => myroom?.roomId === room.roomId).length ===
+          0 && setMyRooms((prev) => [...prev, { ...room }]);
+        setIsChatLoading(false);
+      })
+      .catch((error: any) => {
+        console.log("error:", error);
+      });
   };
 
   return (

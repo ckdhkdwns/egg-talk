@@ -14,6 +14,7 @@ export const isLoginAtom = atom({
 export const userInfoAtom = atom<userData>({ key: "userInfo", default: null });
 
 export const roomsAtom = atom<TypeRoom[]>({ key: "rooms", default: [] });
+export const myRoomsAtom = atom<TypeRoom[]>({ key: "myrooms", default: [] });
 export const currentRoomIdAtom = atom<number | null | undefined>({
   key: "roomId",
   default: null,
@@ -23,3 +24,5 @@ export const messagesAtom = atom<TypeMessage[]>({
   default: [],
 });
 export const newChatModalAtom = atom({ key: "newChatModal", default: false });
+export const allChatAtom = atom({ key: "allchat", default: false });
+export const isChatLoadingAtom = atom({ key: "isChatLoading", default: true });

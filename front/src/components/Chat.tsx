@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import {
   currentRoomIdAtom,
+  isChatLoadingAtom,
   isDarkAtom,
   messagesAtom,
   roomsAtom,
@@ -15,6 +16,7 @@ import axios from "axios";
 import { API_URL, TypeMessage } from "../api";
 import { useForm } from "react-hook-form";
 import SockJS from "sockjs-client";
+import Loader from "./Loader";
 
 const Wrapper = styled.div<{ isDark: boolean }>`
   display: flex;
@@ -101,26 +103,34 @@ function Chat() {
   const setMessages = useSetRecoilState(messagesAtom);
   const rooms = useRecoilValue(roomsAtom);
   const roomId = useRecoilValue(currentRoomIdAtom);
-
+  const [isChatLoading, setIsChatLoading] = useRecoilState(isChatLoadingAtom);
   const {
     register,
     handleSubmit,
     // formState: { errors },
   } = useForm();
+  const chatBoxRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  };
 
   let sock = new SockJS(API_URL + "/chat");
   let ws = Stomp.over(sock);
   const token = JSON.parse(localStorage["token"]).token;
 
-  async function connectServer() {
+  function connectServer() {
     ws.connect(
       { Authorization: JSON.parse(localStorage["token"]).token },
       () => {
         ws.subscribe("/sub/chat/room/" + roomId, (message) => {
           var recv: TypeMessage = JSON.parse(message.body);
           console.log(recv);
-          console.log(messages);
-          setMessages([...messages, recv]);
+          // console.log("ref:", temp);
+          // setMessages([...temp.current, recv]);
+          setMessages((prev) => [...prev, recv]);
         });
         ws.send(
           "/pub/message",
@@ -138,7 +148,6 @@ function Chat() {
       }
     );
   }
-
   function onSend(messageData: any, e: any) {
     e.target[0].value = "";
     ws.send(
@@ -154,33 +163,27 @@ function Chat() {
     );
   }
 
-  const chatBoxRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    if (chatBoxRef.current) {
-      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
-    }
-  };
-
   useEffect(() => {
     console.log(`Entering room: ${roomId}`);
     // const { token }: any = JSON.parse(localStorage.getItem("token")!);
     if (roomId) {
-      // axios
-      //   .get(API_URL + "/rooms/" + roomId + "/messages", {
-      //     headers: { Authorization: token },
-      //   })
-      //   .then((res) => {
-      //     setMessages(res.data);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
+      axios
+        .get(API_URL + "/rooms/" + roomId + "/messages", {
+          headers: { Authorization: token },
+        })
+        .then((res) => {
+          // console.log(res.data);
+          setMessages(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       connectServer();
     }
   }, [roomId]);
 
   useEffect(() => {
+    // temp.current = messages;
     scrollToBottom();
   }, [messages]);
 
@@ -196,27 +199,33 @@ function Chat() {
           <SearchIcon fill="#fff" />
         </SearchBtnContainer>
       </Header>
-      <ChatContainer ref={chatBoxRef} isDark={isDark}>
-        <div style={{ width: "100%", height: "100%" }}>
-          {messages.map((message, i) => {
-            return <Message key={i} {...message} />;
-          })}
-        </div>
-      </ChatContainer>
-      <Form onSubmit={handleSubmit(onSend)}>
-        <InputContainer>
-          <Input
-            {...register("message", {
-              required: "This is Required",
-              minLength: 1,
-            })}
-            placeholder="메세지를 입력하세요."
-          />
-          <SendBtn type="submit">
-            <SendIcon fill="#cccccc" />
-          </SendBtn>
-        </InputContainer>
-      </Form>
+      {isChatLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <ChatContainer ref={chatBoxRef} isDark={isDark}>
+            <div style={{ width: "100%", height: "100%" }}>
+              {messages.map((message, i) => {
+                return <Message key={i} {...message} id={i} />;
+              })}
+            </div>
+          </ChatContainer>
+          <Form onSubmit={handleSubmit(onSend)}>
+            <InputContainer>
+              <Input
+                {...register("message", {
+                  required: "This is Required",
+                  minLength: 1,
+                })}
+                placeholder="메세지를 입력하세요."
+              />
+              <SendBtn type="submit">
+                <SendIcon fill="#cccccc" />
+              </SendBtn>
+            </InputContainer>
+          </Form>
+        </>
+      )}
     </Wrapper>
   );
 }

@@ -7,7 +7,7 @@ function Loader() {
       style={{
         display: "flex",
         justifyContent: "center",
-        margin: "20px auto",
+        margin: "auto",
         width: "fit-content",
       }}
     >

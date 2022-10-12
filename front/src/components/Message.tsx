@@ -2,7 +2,7 @@ import React from "react";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { TypeMessage } from "../api";
-import { userInfoAtom } from "../atoms";
+import { messagesAtom, userInfoAtom } from "../atoms";
 
 const Wrapper = styled.div<{ incoming: Boolean }>`
   width: 100%;
@@ -33,9 +33,16 @@ const GetRoom = styled.div`
 function Message(model: TypeMessage) {
   const userInfo = useRecoilValue(userInfoAtom); // test32
   const isIncoming = !(model.displayname === userInfo?.displayname);
+  const messages = useRecoilValue(messagesAtom);
 
   return (
-    <Wrapper incoming={isIncoming}>
+    <Wrapper
+      incoming={isIncoming}
+      style={{
+        paddingTop: model.id === 0 ? "10px" : "0",
+        paddingBottom: model.id === messages.length - 1 ? "10px" : "0",
+      }}
+    >
       {model.messageType === 0 || model.messageType === 2 ? (
         <GetRoom>{model.content}</GetRoom>
       ) : (

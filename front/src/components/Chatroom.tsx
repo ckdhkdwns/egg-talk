@@ -1,15 +1,17 @@
 import axios, { AxiosResponse } from "axios";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { API_URL } from "../api";
 import { ReactComponent as SearchIcon } from "../images/search.svg";
 import { ReactComponent as AddIcon } from "../images/add.svg";
 import {
+  allChatAtom,
   currentRoomIdAtom,
   isDarkAtom,
   isLoginAtom,
+  myRoomsAtom,
   newChatModalAtom,
   roomsAtom,
   userInfoAtom,
@@ -69,11 +71,12 @@ function Chatroom() {
   const navigate = useNavigate();
   const isDark = useRecoilValue(isDarkAtom);
   const isLogin = useRecoilValue(isLoginAtom);
-  const rooms = useRecoilValue(roomsAtom);
-  const setRooms = useSetRecoilState(roomsAtom);
   const userInfo = useRecoilValue(userInfoAtom);
-  const setRoomId = useSetRecoilState(currentRoomIdAtom);
+  const setCurrentRoomId = useSetRecoilState(currentRoomIdAtom);
   const setNewChatModal = useSetRecoilState(newChatModalAtom);
+  const [rooms, setRooms] = useRecoilState(roomsAtom);
+  const [myrooms, setMyRooms] = useRecoilState(myRoomsAtom);
+  const [allChat, setAllChat] = useRecoilState(allChatAtom);
 
   useEffect(() => {
     // if token doesn't exist or is empty string, let client login
@@ -81,10 +84,9 @@ function Chatroom() {
       navigate("/login");
       return;
     }
-
     const { token }: any = JSON.parse(localStorage.getItem("token")!);
 
-    userInfo &&
+    if (userInfo) {
       axios
         .get(API_URL + `/rooms`, {
           headers: {
@@ -92,21 +94,38 @@ function Chatroom() {
           },
         })
         .then(function (response: AxiosResponse) {
-          console.log("/rooms =>", response.data);
           setRooms(response.data);
-          setRoomId(response.data[0].roomId);
         })
         .catch((error: any) => {
           console.log(`error at /rooms =>`, error);
         });
-  }, [isLogin, navigate, setRoomId, userInfo]);
+      axios
+        .get(API_URL + `/users/${userInfo.username}/rooms`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(function (response: AxiosResponse) {
+          console.log(response.data);
+          setMyRooms(response.data);
+          setCurrentRoomId(response.data[0].roomId);
+        })
+        .catch((error: any) => {
+          console.log(`error at /users/${userInfo.username}/rooms =>`, error);
+        });
+    }
+  }, [isLogin, navigate, setRooms, userInfo]);
+
+  const toggleAllChat = () => {
+    setAllChat((prev) => !prev);
+  };
 
   return (
     <Wrapper isDark={isDark}>
       <Header isDark={isDark}>
-        <HeaderTitle>채팅</HeaderTitle>
+        <HeaderTitle>{allChat ? "전체 체팅" : "내 채팅"}</HeaderTitle>
         <HeaderItems>
-          <HeaderItem>
+          <HeaderItem onClick={toggleAllChat}>
             <SearchIcon fill="#fff" />
           </HeaderItem>
           <HeaderItem onClick={() => setNewChatModal(true)}>
@@ -115,9 +134,9 @@ function Chatroom() {
         </HeaderItems>
       </Header>
       <RoomList>
-        {rooms?.map((room, i) => (
-          <Room key={i} {...room} />
-        ))}
+        {allChat
+          ? rooms?.map((room, i) => <Room key={i} {...room} />)
+          : myrooms?.map((room, i) => <Room key={i} {...room} />)}
       </RoomList>
     </Wrapper>
   );

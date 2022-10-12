@@ -1,9 +1,11 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import Modal from "styled-react-modal";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
-import { newChatModalAtom } from "../atoms";
+import { newChatModalAtom, roomsAtom } from "../atoms";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import { API_URL } from "../api";
 
 const Container = styled.div`
   width: 450px;
@@ -84,6 +86,8 @@ interface IModal {
 
 function NewChatModal({ isOpen }: IModal) {
   const setNewChatModalIsOpen = useSetRecoilState(newChatModalAtom);
+  const prevRooms = useRecoilValue(roomsAtom);
+  const setRooms = useSetRecoilState(roomsAtom);
 
   const {
     register,
@@ -92,9 +96,31 @@ function NewChatModal({ isOpen }: IModal) {
   } = useForm();
 
   const onSubmit = (data: any, e: any) => {
-    e.preventDefault();
+    console.log(e.target[0]);
     e.target[0].value = "";
-    console.log(data);
+
+    const { token }: any = JSON.parse(localStorage.getItem("token")!);
+
+    axios
+      .post(
+        API_URL + "/rooms",
+        {
+          roomName: data.roomname,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(function (response: AxiosResponse) {
+        console.log(prevRooms, response);
+        setRooms([...prevRooms, response.data]);
+      })
+      .catch((error: AxiosError) => {
+        console.log("error at /rooms", error.response?.data);
+      });
+    setNewChatModalIsOpen(false);
   };
 
   const handleClose = () => {

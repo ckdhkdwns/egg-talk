@@ -6,15 +6,13 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { API_URL, userData } from "../api";
 import {
-  currentRoomIdAtom,
+  isChatLoadingAtom,
   isLoginAtom,
-  messagesAtom,
   newChatModalAtom,
   userInfoAtom,
 } from "../atoms";
 import Chat from "../components/Chat";
 import Chatroom from "../components/Chatroom";
-import Loader from "../components/Loader";
 import NewChatModal from "../components/NewChatModal";
 
 const Wrapper = styled.div`
@@ -42,8 +40,7 @@ function Main() {
   const setUser = useSetRecoilState<userData>(userInfoAtom);
   const isLogin = useRecoilValue(isLoginAtom);
   const newChatModalIsOpen = useRecoilValue(newChatModalAtom);
-  const setMessages = useSetRecoilState(messagesAtom);
-  const currentRoomId = useRecoilValue(currentRoomIdAtom);
+  const setIsChatLoading = useSetRecoilState(isChatLoadingAtom);
 
   useEffect(() => {
     // if token doesn't exist or is empty string, let client login
@@ -62,38 +59,19 @@ function Main() {
       })
       .then(function (response: AxiosResponse) {
         setUser(response.data);
+        setIsChatLoading(false);
       })
       .catch((error: any) => {
         console.log("error at /user/me", error);
       });
-  }, [isLogin, navigate, setUser]);
-
-  useEffect(() => {
-    const { token }: any = JSON.parse(localStorage.getItem("token")!);
-    currentRoomId &&
-      axios
-        .get("/rooms/" + currentRoomId + "/messages", {
-          headers: { Authorization: token },
-        })
-        .then((res) => {
-          console.log(res.data);
-          setMessages(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-  }, [currentRoomId]);
+  }, [isLogin, navigate, setIsChatLoading, setUser]);
 
   return isLogin ? (
     <Wrapper>
-      {true ? (
-        <Container responsive>
-          <Chatroom />
-          <Chat />
-        </Container>
-      ) : (
-        <Loader />
-      )}
+      <Container responsive>
+        <Chatroom />
+        <Chat />
+      </Container>
       <NewChatModal isOpen={newChatModalIsOpen} />
     </Wrapper>
   ) : null;
